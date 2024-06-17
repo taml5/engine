@@ -1,5 +1,5 @@
-#include "../include/glfw3.h"
-#include "../include/glfw3native.h"
+#include <GLFW/glfw3.h>
+#include <GLFW/glfw3native.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -38,7 +38,6 @@ int main(int argc, char *argv[]) {
         process_input(window);
 
         /* Render here */
-        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
         /* Swap front and back buffers */

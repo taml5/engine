@@ -1,19 +1,22 @@
-FFLAGS = -lglfw3 -framework CoreVideo -framework OpenGL -framework IOKit -framework Cocoa -framework Carbon
+CFLAGS = -std=gnu99 -lglfw3 -framework CoreVideo -framework OpenGL -framework IOKit -framework Cocoa -framework Carbon
 
-all: engine
+engine: build/main.o build/graphics.o 
+	gcc ${CFLAGS} build/main.o build/graphics.o -o engine
 
-engine: main.o graphics.o
-	gcc -std=gnu99 ${FFLAGS} build/main.o build/graphics.o -o engine
+build/main.o: src/main.c include/graphics.h include/game.h
+	@mkdir -p ./build/
+	gcc -I./include/ -c -o $@ $<
+
+build/graphics.o: src/graphics.c include/graphics.h
+	gcc -I./include/ -c -o $@ $<
+
+
+.PHONY: debug clean
+	
 
 debug: main.o graphics.o
-	gcc -std=gnu99 -D DEBUG ${FFLAGS} build/main.o build/graphics.o -o engine
+	gcc -D DEBUG ${CFLAGS} build/main.o build/graphics.o -o engine
 
-main.o: src/main.c include/graphics.h include/game.h
-	gcc -I./include/ -c -o build/$@ $<
-
-graphics.o: src/graphics.c include/graphics.h
-	gcc -I./include/ -c -o build/$@ $<
-
-.PHONY clean:
-	rm -r ./build
+clean:
+	rm -r ./build/
 	rm ./engine

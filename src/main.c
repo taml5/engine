@@ -2,10 +2,7 @@
 #define GAME
 #include "game.h"
 #endif
-#ifndef GRAPHICS
-#define GRAPHICS
 #include "graphics.h"
-#endif
 
 /**
  * Process the inputs of the user and perform different actions based on them.

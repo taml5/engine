@@ -9,6 +9,9 @@
 
 #define FOCAL_LEN 1
 
+#define SCR_WIDTH 640  // screen width
+#define SCR_HEIGHT 480  // screen height
+
 /**
  * A struct representing a ray described parametrically.
  * 

@@ -15,20 +15,36 @@
  */
 void process_input(GLFWwindow *window, struct camera *camera)
 {
-    if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
+    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
         glfwSetWindowShouldClose(window, 1);
     }
-    if(glfwGetKey(window, GLFW_KEY_J) == GLFW_PRESS) {
+    if (glfwGetKey(window, GLFW_KEY_J) == GLFW_PRESS) {
         // turn left
-        camera->angle = fmod(camera->angle + ROT_SPD, PI * 2);
+        camera->angle = fmod(camera->angle + ROTSPD, PI * 2);
         camera->anglecos = cos(camera->angle);
         camera->anglesin = sin(camera->angle);
     }
-    if(glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS) {
+    if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS) {
         // turn right
-        camera->angle = fmod(camera->angle - ROT_SPD, PI * 2);
+        camera->angle = fmod(camera->angle - ROTSPD, PI * 2);
         camera->anglecos = cos(camera->angle);
         camera->anglesin = sin(camera->angle);
+    }
+    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+        camera->pos->x += MVTSPD * camera->anglecos;
+        camera->pos->y += MVTSPD * camera->anglesin;
+    }
+    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
+        camera->pos->x -= MVTSPD * camera->anglecos;
+        camera->pos->y -= MVTSPD * camera->anglesin;
+    }
+    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
+        camera->pos->x -= MVTSPD * camera->anglesin;
+        camera->pos->y += MVTSPD * camera->anglecos;
+    }
+    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
+        camera->pos->x += MVTSPD * camera->anglesin;
+        camera->pos->y -= MVTSPD * camera->anglecos;
     }
 }
 

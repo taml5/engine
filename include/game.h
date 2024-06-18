@@ -6,11 +6,8 @@
 #include <string.h>
 #include <math.h>
 
-#define SCR_WIDTH 640  // screen width
-#define SCR_HEIGHT 480  // screen height
-
-#define ROT_SPD 3.0f * 0.016f  // camera rotating speed
-#define MOVE_SPD 3.0f * 0.016f  // movement speed
+#define ROTSPD 3.0f * 0.016f  // camera rotating speed
+#define MVTSPD 3.0f * 0.016f  // movement speed
 
 #define MAX_SECTOR 256  // max number of sectors
 #define MAX_WALL 128  // max number of walls in a sector

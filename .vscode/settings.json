@@ -1,5 +1,11 @@
 {
     "files.associations": {
-        "glfw3.h": "c"
+        "glfw3.h": "c",
+        "stdlib.h": "c",
+        "render.h": "c",
+        "maths.h": "c",
+        "stdio.h": "c",
+        "game.h": "c",
+        "graphics.h": "c"
     }
 }

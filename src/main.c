@@ -31,18 +31,22 @@ void process_input(GLFWwindow *window, struct camera *camera)
         camera->anglesin = sin(camera->angle);
     }
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+        // go back
         camera->pos->x += MVTSPD * camera->anglecos;
         camera->pos->y += MVTSPD * camera->anglesin;
     }
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
+        // go forward
         camera->pos->x -= MVTSPD * camera->anglecos;
         camera->pos->y -= MVTSPD * camera->anglesin;
     }
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
+        // go left
         camera->pos->x -= MVTSPD * camera->anglesin;
         camera->pos->y += MVTSPD * camera->anglecos;
     }
     if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
+        // go right
         camera->pos->x += MVTSPD * camera->anglesin;
         camera->pos->y -= MVTSPD * camera->anglecos;
     }
@@ -90,8 +94,7 @@ int main(int argc, char *argv[]) {
     glfwMakeContextCurrent(window);
 
     /* Loop until the user closes the window */
-    while (!glfwWindowShouldClose(window))
-    {
+    while (!glfwWindowShouldClose(window)) {
         process_input(window, camera);
 
         /* Render here */
@@ -99,6 +102,14 @@ int main(int argc, char *argv[]) {
 
         double depth;
         for (int x = 0; x < SCR_WIDTH; x++) {
+            glBegin(GL_LINES);
+                glColor3f(0.3, 0.3, 0.3);
+                glVertex2f(2.0f * (x + 0.5f) / SCR_WIDTH - 1.0f, 1.0);
+                glVertex2f(2.0f * (x + 0.5f) / SCR_WIDTH - 1.0f, 0.0);
+                glColor3f(0.1, 0.1, 0.1);
+                glVertex2f(2.0f * (x + 0.5f) / SCR_WIDTH - 1.0f, 0.0);
+                glVertex2f(2.0f * (x + 0.5f) / SCR_WIDTH - 1.0f, -1.0);
+            glEnd();
             struct ray *ray = viewing_ray(camera, x);
             
             if ((depth = intersection(ray, &test_wall)) > 0) { 
@@ -108,8 +119,9 @@ int main(int argc, char *argv[]) {
                 int y1 = min((SCR_HEIGHT / 2) + (line_height / 2), SCR_HEIGHT - 1);
 
                 glBegin(GL_LINES);
-                    glVertex2f(2.0f * (x + 0.5f) / SCR_WIDTH - 1.0f, 2.0f * (y1 + 0.5f) / SCR_HEIGHT - 1.0f);
+                    glColor3f(0, 0.4, 0.8);
                     glVertex2f(2.0f * (x + 0.5f) / SCR_WIDTH - 1.0f, 2.0f * (y0 + 0.5f) / SCR_HEIGHT - 1.0f);
+                    glVertex2f(2.0f * (x + 0.5f) / SCR_WIDTH - 1.0f, 2.0f * (y1 + 0.5f) / SCR_HEIGHT - 1.0f);
                 glEnd();
             }
 

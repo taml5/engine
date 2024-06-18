@@ -19,6 +19,8 @@ struct ray *viewing_ray(struct camera *camera, int x) {
 }
 
 double intersection(struct ray *ray, struct wall *wall) {
+    // implementation of cramer's rule on the system of linear equations
+    // given by equating the parametric equations of both lines
     double walldir_x = wall->right.x - wall->left.x;
     double walldir_y = wall->right.y - wall->right.y;
     double p_min_l_x = ray->origin->x - wall->left.x;
@@ -26,14 +28,18 @@ double intersection(struct ray *ray, struct wall *wall) {
 
     double denom = (walldir_x * ray->direction->y) - (walldir_y * ray->direction->x);
     if (-0.000001f < denom && denom < 0.000001f) {
+        // The lines are parallel and will not intersect. A little error is given
+        // for floating point errors.
         return -1;
     }
     double s = ((p_min_l_x * ray->direction->y) - (p_min_l_y * ray->direction->x)) / denom;
     if (s < 0 || s > 1) {
+        // intersection lies outside of the point
         return -1;
     }
     double t = ((walldir_x * p_min_l_y) - (walldir_y * p_min_l_x)) / denom;
     if (t < 0) {
+        // intersection occurs behind camera
         return -1;
     }
     

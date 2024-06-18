@@ -23,24 +23,33 @@ struct ray {
 };
 
 /**
- * TODO: fill this in
+ * Generate a ray from the camera through a particular y-slice of the image plane.
  * 
  * @param camera: A pointer to the camera.
  * @param x: The x coordinate (in the image plane) of the pixel to cast the ray through
- * @returns A heap allocated ray struct.
+ * @returns A heap allocated ray struct, with the origin being the camera, and the direction
+ *          going through the y-slice. In the parametric representation, when t=1, the resulting
+ *          vector lies on the image plane.
  */
 struct ray *viewing_ray(struct camera *camera, int x);
 
 /**
  * Deallocate the memory used by a ray.
+ * 
+ * @param ray: The ray to be deallocated.
  */
 void destroy_ray(struct ray *ray);
 
 /**
- * TODO: fill this in
+ * Determine if there is an intersection between a wall and a viewing ray. If there is an 
+ * intersection, return the parameter `t` from the parametric representation of the ray 
+ * such that the vector `ray.origin + t * ray.direction` results in the intersection. If 
+ * there is no intersection, return -1.0.
  * 
- * @param ray:
- * @param wall:
- * @returns ...
+ * @param ray: The viewing ray.
+ * @param wall: The wall which an intersection is to be checked with.
+ * @returns The "depth" of the intersection, that is, the distance between the camera and the 
+ *          wall, given in the basis of the focal length. If there is no intersection, 
+ *          -1.0 is returned.
  */
 double intersection(struct ray *ray, struct wall *wall);

@@ -8,7 +8,7 @@
 #endif
 
 /**
- * TODO: fill this in
+ * Process the inputs of the user and perform different actions based on them.
  * 
  * @param window: A pointer to the GLFW window struct.
  * @param camera: A pointer to the camera struct.
@@ -70,7 +70,7 @@ int main(int argc, char *argv[]) {
     camera->pos = malloc(sizeof(struct vec2));
     camera->pos->x = 0;
     camera->pos->y = 0;
-    camera->angle = 0;
+    camera->angle = 1.5 * PI;
     camera->anglecos = cos(camera->angle);
     camera->anglesin = sin(camera->angle);
     camera->sector = 1;

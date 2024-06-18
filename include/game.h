@@ -79,7 +79,10 @@ struct camera {
 };
 
 /**
- * A struct to...
+ * A struct to hold game data.
+ * 
+ * @param sectors: an array of the sectors in the game.
+ * @param walls: an array of the walls in the game.
  */
 struct game {
     struct sector sectors[MAX_SECTOR];

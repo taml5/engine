@@ -33,7 +33,7 @@ double intersection(struct ray *ray, struct wall *wall) {
         return -1;
     }
     double t = ((walldir_x * p_min_l_y) - (walldir_y * p_min_l_x)) / denom;
-    if (t < FOCAL_LEN) {
+    if (t < 0) {
         return -1;
     }
     

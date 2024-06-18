@@ -101,7 +101,7 @@ int main(int argc, char *argv[]) {
         for (int x = 0; x < SCR_WIDTH; x++) {
             struct ray *ray = viewing_ray(camera, x);
             
-            if ((depth = intersection(ray, &test_wall)) > FOCAL_LEN) { 
+            if ((depth = intersection(ray, &test_wall)) > 0) { 
                 // DRAW THE VERTICAL LINE
                 int line_height = (int) SCR_HEIGHT / depth;
                 int y0 = max((SCR_HEIGHT / 2) - (line_height / 2), 0);

@@ -68,7 +68,7 @@ int main(int argc, char *argv[]) {
 
     // initialise pixel buffer storing luminance and alpha
     float pixel_arr[SCR_WIDTH * SCR_HEIGHT * 2];
-    reset_buffer(pixel_arr);
+    memset(pixel_arr, 0, sizeof(float) * 2 * SCR_HEIGHT * SCR_WIDTH);
 
     // initialise camera
     struct camera *camera = malloc(sizeof(struct camera));
@@ -100,7 +100,7 @@ int main(int argc, char *argv[]) {
 
         /* Render here */
         glClear(GL_COLOR_BUFFER_BIT);
-        reset_buffer(pixel_arr);
+        memset(pixel_arr, 0, sizeof(float) * 2 * SCR_HEIGHT * SCR_WIDTH);  // reset pixel buffer
 
         double depth;
         for (int x = 0; x < SCR_WIDTH; x++) {

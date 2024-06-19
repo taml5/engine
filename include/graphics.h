@@ -13,12 +13,15 @@
 #define SCR_HEIGHT 480  // screen height
 
 /**
+ * Draw a vertical line from (x, y0) to (x, y1) in the pixel buffer, with luminance `lum`
+ * and alpha `alpha`.
  * 
- */
-void reset_buffer(float *pixel_arr);
-
-/**
- * 
+ * @param pixel_arr: The pixel buffer.
+ * @param x: The x coordinate of the line.
+ * @param y0: The starting endpoint of the line.
+ * @param y1: The ending endpoint of the line.
+ * @param lum: The luminance of the line.
+ * @param alpha: The alpha of the line.
  */
 void draw_vert(float *pixel_arr, int x, int y0, int y1, float lum, float alpha);
 

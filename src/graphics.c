@@ -1,12 +1,5 @@
 #include "graphics.h"
 
-void reset_buffer(float *pixel_arr) {
-    for (int i = 0; i < SCR_WIDTH * SCR_HEIGHT; i++) {
-        pixel_arr[2 * i] = 0.1;  // no luminance
-        pixel_arr[2 * i + 1] = 1.0;  // 
-    }
-}
-
 void draw_vert(float *pixel_arr, int x, int y0, int y1, float lum, float alpha) {
     for (int i = y0; i < y1; i++) {
         pixel_arr[2 * (i * SCR_WIDTH + x)] = lum;

@@ -40,7 +40,8 @@ struct vec2i {
  * 
  * @param start: The starting endpoint of the wall.
  * @param end: The ending endpoint of the wall.
- * @param portal: Whether this wall is a portal or not.
+ * @param portal: The sector that this portal leads to. If this is not
+ *                a portal, its value will be -1.
  */
 struct wall {
     struct vec2i start, end;
@@ -51,14 +52,15 @@ struct wall {
  * A sector of the map. This is a section of the map enclosed by walls.
  * 
  * @param id: The ID of the sector.
- * @param walls: The starting index of the first wall in the walls array.
  * @param n_walls: The number of walls in this sector.
+ * @param walls: A pointer to an array of wall pointers that make up this sector.
  * @param floor_z: The height of the floor.
  * @param ceil_z: The height of the ceiling.
  */
 struct sector {
     int id;
-    size_t walls, n_walls;
+    size_t n_walls;
+    struct wall **walls;
     float floor_z;
     float ceil_z;
 };
@@ -77,15 +79,4 @@ struct camera {
     struct vec2 *pos;
     int sector;
     float angle, anglecos, anglesin;
-};
-
-/**
- * A struct to hold game data.
- * 
- * @param sectors: an array of the sectors in the game.
- * @param walls: an array of the walls in the game.
- */
-struct game {
-    struct sector sectors[MAX_SECTOR];
-    struct wall walls[MAX_WALL];
 };

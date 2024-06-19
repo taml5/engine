@@ -7,12 +7,15 @@
  * Load the map of sectors from the given filepath.
  * 
  * @param filepath: The filepath to read the map data from.
+ * @param n_sectors: The number of sectors loaded.
+ * @return A pointer to a heap allocated 
+ * 
  */
-struct game *load_sectors(char *filepath);
+struct sector *load_sectors(char *filepath, int *n_sectors);
 
 /**
- * Deallocate the given game struct.
+ * Deallocate the sector array.
  * 
- * @param game: The game struct.
+ * @param sectors: A pointer to the sector array.
  */
-void destroy_game(struct game *game);
+void destroy_sectors(struct sector *sectors);

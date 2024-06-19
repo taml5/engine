@@ -1,12 +1,11 @@
 #include "load.h"
 
-struct game *load_sectors(char *filepath) {
+struct sector *load_sectors(char *filepath, int *n_sectors) {
     // TODO: complete this function
-    struct game *game = malloc(sizeof(struct game));
-    return game;
+    return NULL;
 }
 
-void destroy_game(struct game *game) {
+void destroy_sectors(struct sector *sectors) {
     // TODO: complete this function
     return;
 }

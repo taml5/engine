@@ -3,6 +3,7 @@
 #include "game.h"
 #endif
 #include "graphics.h"
+#include "load.h"
 
 /**
  * Process the inputs of the user and perform different actions based on them.
@@ -59,9 +60,9 @@ int main(int argc, char *argv[]) {
     glfwGetVersion(&major, &minor, &revision);
     printf("Running against GLFW %i.%i.%i\n", major, minor, revision);
 
-    // TODO: initialise game struct
-
     // TODO: load sectors and build sector and wall structs
+    // struct sector *sectors = load_sectors("./content/");
+
     struct wall test_wall;
     test_wall.start = (struct vec2i) {0, 3};
     test_wall.end = (struct vec2i) {3, 0};
@@ -105,8 +106,9 @@ int main(int argc, char *argv[]) {
         double depth;
         for (int x = 0; x < SCR_WIDTH; x++) {
             struct ray *ray = viewing_ray(camera, x);
+            draw_vert(pixel_arr, x, 0, SCR_HEIGHT / 2, 0.3, 1.0);
             
-            if (intersection(ray, &test_wall, &depth) == 0) { 
+            if (intersection(ray, &test_wall, &depth)) { 
                 // DRAW THE VERTICAL LINE
                 int line_height = (int) SCR_HEIGHT / depth;
                 int y0 = max((SCR_HEIGHT / 2) - (line_height / 2), 0);

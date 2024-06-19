@@ -63,8 +63,12 @@ int main(int argc, char *argv[]) {
 
     // TODO: load sectors and build sector and wall structs
     struct wall test_wall;
-    test_wall.left = (struct vec2i) {0, 3};
-    test_wall.right = (struct vec2i) {3, 0};
+    test_wall.start = (struct vec2i) {0, 3};
+    test_wall.end = (struct vec2i) {3, 0};
+
+    // initialise pixel buffer storing luminance and alpha
+    float pixel_arr[SCR_WIDTH * SCR_HEIGHT * 2];
+    reset_buffer(pixel_arr);
 
     // initialise camera
     struct camera *camera = malloc(sizeof(struct camera));
@@ -96,36 +100,29 @@ int main(int argc, char *argv[]) {
 
         /* Render here */
         glClear(GL_COLOR_BUFFER_BIT);
+        reset_buffer(pixel_arr);
 
         double depth;
         for (int x = 0; x < SCR_WIDTH; x++) {
-            glBegin(GL_LINES);
-                glColor3f(0.3, 0.3, 0.3);
-                glVertex2f(2.0f * (x + 0.5f) / SCR_WIDTH - 1.0f, 1.0);
-                glVertex2f(2.0f * (x + 0.5f) / SCR_WIDTH - 1.0f, 0.0);
-                glColor3f(0.1, 0.1, 0.1);
-                glVertex2f(2.0f * (x + 0.5f) / SCR_WIDTH - 1.0f, 0.0);
-                glVertex2f(2.0f * (x + 0.5f) / SCR_WIDTH - 1.0f, -1.0);
-            glEnd();
             struct ray *ray = viewing_ray(camera, x);
             
-            if ((depth = intersection(ray, &test_wall)) > 0) { 
+            if (intersection(ray, &test_wall, &depth) == 0) { 
                 // DRAW THE VERTICAL LINE
                 int line_height = (int) SCR_HEIGHT / depth;
                 int y0 = max((SCR_HEIGHT / 2) - (line_height / 2), 0);
                 int y1 = min((SCR_HEIGHT / 2) + (line_height / 2), SCR_HEIGHT - 1);
 
-                glBegin(GL_LINES);
-                    glColor3f(0, 0.4, 0.8);
-                    glVertex2f(2.0f * (x + 0.5f) / SCR_WIDTH - 1.0f, 2.0f * (y0 + 0.5f) / SCR_HEIGHT - 1.0f);
-                    glVertex2f(2.0f * (x + 0.5f) / SCR_WIDTH - 1.0f, 2.0f * (y1 + 0.5f) / SCR_HEIGHT - 1.0f);
-                glEnd();
+                draw_vert(pixel_arr, x, y0, y1, 1.0, 1.0);
             }
 
             destroy_ray(ray);
         }
 
         // TODO: apply dithering filter
+
+        // draw pixels
+        glPixelZoom(2, 2);
+        glDrawPixels(SCR_WIDTH, SCR_HEIGHT, GL_LUMINANCE_ALPHA, GL_FLOAT, pixel_arr);
 
         /* Swap front and back buffers */
         glfwSwapBuffers(window);

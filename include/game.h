@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+#include <stdbool.h>
 
 #define ROTSPD 3.0f * 0.016f  // camera rotating speed
 #define MVTSPD 3.0f * 0.016f  // movement speed
@@ -37,12 +38,12 @@ struct vec2i {
 /**
  * A wall of the map.
  * 
- * @param left: The left endpoint of the wall.
- * @param right: The right endpoint of the wall.
+ * @param start: The starting endpoint of the wall.
+ * @param end: The ending endpoint of the wall.
  * @param portal: Whether this wall is a portal or not.
  */
 struct wall {
-    struct vec2i left, right;
+    struct vec2i start, end;
     int portal;
 };
 

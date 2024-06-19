@@ -13,6 +13,16 @@
 #define SCR_HEIGHT 480  // screen height
 
 /**
+ * 
+ */
+void reset_buffer(float *pixel_arr);
+
+/**
+ * 
+ */
+void draw_vert(float *pixel_arr, int x, int y0, int y1, float lum, float alpha);
+
+/**
  * A struct representing a ray described parametrically.
  * 
  * @param origin: The origin of the ray.
@@ -41,15 +51,28 @@ struct ray *viewing_ray(struct camera *camera, int x);
 void destroy_ray(struct ray *ray);
 
 /**
- * Determine if there is an intersection between a wall and a viewing ray. If there is an 
- * intersection, return the parameter `t` from the parametric representation of the ray 
- * such that the vector `ray.origin + t * ray.direction` results in the intersection. If 
- * there is no intersection, return -1.0.
+ * Determine if there is an intersection between a given wall and a viewing ray. Store the parameter `t` 
+ * from the parametric representation of the ray such that the vector `ray.origin + t * ray.direction` 
+ * gives the intersection point.
  * 
  * @param ray: The viewing ray.
  * @param wall: The wall which an intersection is to be checked with.
- * @returns The "depth" of the intersection, that is, the distance between the camera and the 
- *          wall, given in the basis of the focal length. If there is no intersection, 
- *          -1.0 is returned.
+ * @param depth: The "depth" of the intersection, that is, the distance between the camera and the 
+ *               wall, given in the basis of the focal length. 
+ * @return Whether there was an intersection or not.
  */
-double intersection(struct ray *ray, struct wall *wall);
+bool intersection(struct ray *ray, struct wall *wall, double *depth);
+
+
+/**
+ * Determine if there was an intersection between a given viewing ray and a wall in the sector. If there
+ * is an intersection, store the depth and wall id in `depth` and `hit_id` respectively.
+ * 
+ * @param ray: The viewing ray.
+ * @param sector: The sector to check for intersections within.
+ * @param depth: The distance from the camera to the colliding wall.
+ * @param hit_id: The id of the intersecting wall.
+ * 
+ * @return Whether there was an intersection or not.
+ */
+bool first_hit(struct ray *ray, struct sector *sector, double *depth, size_t hit_id);

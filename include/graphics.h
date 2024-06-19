@@ -66,7 +66,6 @@ void destroy_ray(struct ray *ray);
  */
 bool intersection(struct ray *ray, struct wall *wall, double *depth);
 
-
 /**
  * Determine if there was an intersection between a given viewing ray and a wall in the sector. If there
  * is an intersection, store the depth and wall id in `depth` and `hit_id` respectively.
@@ -78,4 +77,4 @@ bool intersection(struct ray *ray, struct wall *wall, double *depth);
  * 
  * @return Whether there was an intersection or not.
  */
-bool first_hit(struct ray *ray, struct sector *sector, double *depth, size_t hit_id);
+bool first_hit(struct ray *ray, struct sector *sector, double *depth, int *hit_id);

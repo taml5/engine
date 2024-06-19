@@ -37,19 +37,37 @@ bool intersection(struct ray *ray, struct wall *wall, double *depth) {
     if (-0.000001f < denom && denom < 0.000001f) {
         // the lines are parallel and will not intersect
         // a little error is given for floating point errors
-        return 1;
+        return false;
     }
     double s = ((p_min_l_x * ray->direction->y) - (p_min_l_y * ray->direction->x)) / denom;
     if (s < 0 || s > 1) {
         // intersection lies outside of the point
-        return 1;
+        return false;
     }
     double t = ((walldir_x * p_min_l_y) - (walldir_y * p_min_l_x)) / denom;
     if (t < 0) {
         // only need to check if intersection occurs behind camera (t is negative)
-        return 1;
+        return false;
     }
     
     *depth = t;
-    return 0;
+    return true;
+}
+
+bool first_hit(struct ray *ray, struct sector *sector, double *depth, int *hit_id) {
+    bool hit = false;
+    *depth = HUGE_VAL;
+
+    double curr_depth;
+    for (int i = 0; i < sector->n_walls; i++) {
+        if ((sector->walls[i])->portal != 0) {
+            // TODO: handle the case that the wall is a portal
+            continue;
+        } else if (intersection(ray, sector->walls[i], &curr_depth) && curr_depth < *depth) {
+            hit = true;
+            *hit_id = i;
+            *depth = curr_depth;
+        }
+    }
+    return hit;
 }

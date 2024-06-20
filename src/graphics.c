@@ -1,5 +1,9 @@
 #include "graphics.h"
 
+#define FUDGE 1e-6  // fudge factor to avoid floating point errors
+#define EDGE_LIM 0.003  // limit for edge detection
+#define WORLD2CAM(x) (-1 + (2 * (x + 0.5)) / SCR_WIDTH)   // transformation from world plane to image plane
+
 void draw_vert(float *pixel_arr, int x, int y0, int y1, float lum, float alpha) {
     for (int i = y0; i < y1; i++) {
         pixel_arr[2 * (i * SCR_WIDTH + x)] = lum;
@@ -16,8 +20,8 @@ struct ray *viewing_ray(struct camera *camera, int x) {
     double u_coord = -1.0 + (2 * (x + 0.5)) / SCR_WIDTH;
     
     struct vec2 *ray_dir = malloc(sizeof(struct vec2));
-    ray_dir->x = FOCAL_LEN * camera->anglecos + ((-1 + (2 * (x + 0.5)) / SCR_WIDTH) * camera->anglesin);
-    ray_dir->y = FOCAL_LEN * camera->anglesin + ((-1 + (2 * (x + 0.5)) / SCR_WIDTH) * -camera->anglecos);
+    ray_dir->x = FOCAL_LEN * camera->anglecos + (WORLD2CAM(x) * camera->anglesin);
+    ray_dir->y = FOCAL_LEN * camera->anglesin + (WORLD2CAM(x) * -camera->anglecos);
 
     struct ray *ray = malloc(sizeof(struct ray));
     ray->direction = ray_dir;
@@ -34,7 +38,7 @@ bool intersection(struct ray *ray, struct wall *wall, double min_t, double *dept
     double p_min_l_y = ray->origin->y - wall->start->y;
 
     double denom = (walldir_x * ray->direction->y) - (walldir_y * ray->direction->x);
-    if (-0.000001f < denom && denom < 0.000001f) {
+    if (-FUDGE < denom && denom < FUDGE) {
         // the lines are parallel and will not intersect
         // a little error is given for floating point errors
         return false;
@@ -50,11 +54,7 @@ bool intersection(struct ray *ray, struct wall *wall, double min_t, double *dept
         return false;
     }
     
-    if (s < 0.005 || s > 0.995) {
-        *is_vertex = true;
-    } else {
-        *is_vertex = false;
-    }
+    *is_vertex = (s < 0 + EDGE_LIM || s > 1 - EDGE_LIM) ? true : false;
     *depth = t;
     return true;
 }
@@ -81,7 +81,7 @@ bool first_hit(struct ray *ray,
         return first_hit(ray, 
                          sectors[sector->walls[*hit_id]->portal - 1], 
                          sectors, 
-                         *depth + 0.000001, 
+                         *depth + FUDGE, 
                          is_vertex, 
                          depth, 
                          hit_id);

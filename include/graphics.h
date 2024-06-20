@@ -7,10 +7,10 @@
 #define min(a, b) (a < b ? a : b)
 #define max(a, b) (a < b ? b : a)
 
-#define FOCAL_LEN 1
+#define FOCAL_LEN 1  // the distance from the camera to the image plane, in game units
 
-#define SCR_WIDTH 640  // screen width
-#define SCR_HEIGHT 480  // screen height
+#define SCR_WIDTH 1280  // screen width
+#define SCR_HEIGHT 720  // screen height
 
 /**
  * Draw a vertical line from (x, y0) to (x, y1) in the pixel buffer, with luminance `lum`

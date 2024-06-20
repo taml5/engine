@@ -60,12 +60,13 @@ void destroy_ray(struct ray *ray);
  * 
  * @param ray: The viewing ray.
  * @param wall: The wall which an intersection is to be checked with.
+ * @param min_t:  
  * @param depth: The "depth" of the intersection, that is, the distance between the camera and the 
  *               wall, given in the basis of the focal length.
- * @param min_t:  
+ * @param is_vertex:
  * @return Whether there was an intersection or not.
  */
-bool intersection(struct ray *ray, struct wall *wall, double *depth, double min_t);
+bool intersection(struct ray *ray, struct wall *wall, double min_t, double *depth, bool *is_vertex);
 
 /**
  * Determine if there was an intersection between a given viewing ray and a wall in the sector. If there
@@ -74,10 +75,11 @@ bool intersection(struct ray *ray, struct wall *wall, double *depth, double min_
  * @param ray: The viewing ray.
  * @param sector: The sector to check for intersections within.
  * @param sectors: The array of sectors in the map.
+ * @param min_t:
+ * @param is_vertex: 
  * @param depth: The distance from the camera to the colliding wall.
  * @param hit_id: The id of the intersecting wall.
- * @param min_t:
  * 
  * @return Whether there was an intersection or not.
  */
-bool first_hit(struct ray *ray, struct sector *sector, struct sector **sectors, double *depth, int *hit_id, double min_t);
+bool first_hit(struct ray *ray, struct sector *sector, struct sector **sectors, double min_t, bool *is_vertex, double *depth, int *hit_id);

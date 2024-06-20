@@ -102,11 +102,12 @@ int main(int argc, char *argv[]) {
 
         double depth;
         int hit_id;
+        bool is_vertex;
         for (int x = 0; x < SCR_WIDTH; x++) {
             struct ray *ray = viewing_ray(camera, x);
 
             int sector_index = camera->sector - 1;
-            if (first_hit(ray, sectors[sector_index], sectors, &depth, &hit_id, 0)) {
+            if (first_hit(ray, sectors[sector_index], sectors, 0, &is_vertex, &depth, &hit_id)) {
                 // printf("hit %d\n", hit_id);
                 struct wall *hit_wall = (sectors[sector_index]->walls)[hit_id];
 
@@ -114,7 +115,12 @@ int main(int argc, char *argv[]) {
                 int y0 = max((SCR_HEIGHT / 2) - (line_height / 2), 0);
                 int y1 = min((SCR_HEIGHT / 2) + (line_height / 2), SCR_HEIGHT - 1);
 
-                draw_vert(pixel_arr, x, y0, y1, 0.3, 1.0);
+                if (is_vertex) {
+                    draw_vert(pixel_arr, x, y0, y1, 1.0, 1.0);
+                } else {
+                    draw_vert(pixel_arr, x, y0, y1, 0.3, 1.0);
+                }
+                
             }
 
             destroy_ray(ray);

@@ -25,7 +25,7 @@ struct ray *viewing_ray(struct camera *camera, int x) {
     return ray;
 }
 
-bool intersection(struct ray *ray, struct wall *wall, double *depth, double min_t) {
+bool intersection(struct ray *ray, struct wall *wall, double min_t, double *depth, bool *is_vertex) {
     // implementation of cramer's rule on the system of linear equations
     // given by equating the parametric equations of both lines
     double walldir_x = wall->end->x - wall->start->x;
@@ -50,16 +50,27 @@ bool intersection(struct ray *ray, struct wall *wall, double *depth, double min_
         return false;
     }
     
+    if (s < 0.005 || s > 0.995) {
+        *is_vertex = true;
+    } else {
+        *is_vertex = false;
+    }
     *depth = t;
     return true;
 }
 
-bool first_hit(struct ray *ray, struct sector *sector, struct sector **sectors, double *depth, int *hit_id, double min_t) {
+bool first_hit(struct ray *ray, 
+               struct sector *sector, 
+               struct sector **sectors, 
+               double min_t, 
+               bool *is_vertex, 
+               double *depth, 
+               int *hit_id) {
     bool hit = false;
     *depth = HUGE_VAL;
     double curr_depth;
     for (int i = 0; i < sector->n_walls; i++) {
-        if (intersection(ray, sector->walls[i], &curr_depth, min_t)) {
+        if (intersection(ray, sector->walls[i], min_t, &curr_depth, is_vertex)) {
             if (curr_depth < *depth) {
                 hit = true;
                 *hit_id = i;
@@ -69,7 +80,13 @@ bool first_hit(struct ray *ray, struct sector *sector, struct sector **sectors, 
     }
 
     if (hit && sector->walls[*hit_id]->portal != 0) {
-        return first_hit(ray, sectors[sector->walls[*hit_id]->portal - 1], sectors, depth, hit_id, *depth + 0.000001);
+        return first_hit(ray, 
+                         sectors[sector->walls[*hit_id]->portal - 1], 
+                         sectors, 
+                         *depth + 0.000001, 
+                         is_vertex, 
+                         depth, 
+                         hit_id);
     }
     return hit;
 }

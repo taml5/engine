@@ -44,7 +44,7 @@ struct vec2i {
  *                a portal, its value will be -1.
  */
 struct wall {
-    struct vec2i start, end;
+    struct vec2i *start, *end;
     int portal;
 };
 

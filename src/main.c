@@ -61,11 +61,8 @@ int main(int argc, char *argv[]) {
     printf("Running against GLFW %i.%i.%i\n", major, minor, revision);
 
     // TODO: load sectors and build sector and wall structs
-    // struct sector *sectors = load_sectors("./content/");
-
-    struct wall test_wall;
-    test_wall.start = (struct vec2i) {0, 3};
-    test_wall.end = (struct vec2i) {3, 0};
+    int n_sectors;
+    struct sector **sectors = load_sectors("./content/map.txt", &n_sectors);
 
     // initialise pixel buffer storing luminance and alpha
     float pixel_arr[SCR_WIDTH * SCR_HEIGHT * 2];
@@ -74,9 +71,9 @@ int main(int argc, char *argv[]) {
     // initialise camera
     struct camera *camera = malloc(sizeof(struct camera));
     camera->pos = malloc(sizeof(struct vec2));
-    camera->pos->x = 0;
-    camera->pos->y = 0;
-    camera->angle = 1.5 * PI;
+    camera->pos->x = 2;
+    camera->pos->y = 2;
+    camera->angle = 0;
     camera->anglecos = cos(camera->angle);
     camera->anglesin = sin(camera->angle);
     camera->sector = 1;
@@ -104,17 +101,20 @@ int main(int argc, char *argv[]) {
         memset(pixel_arr, 0, sizeof(float) * 2 * SCR_HEIGHT * SCR_WIDTH);  // reset pixel buffer
 
         double depth;
+        int hit_id;
         for (int x = 0; x < SCR_WIDTH; x++) {
             struct ray *ray = viewing_ray(camera, x);
-            draw_vert(pixel_arr, x, 0, SCR_HEIGHT / 2, 0.3, 1.0);
-            
-            if (intersection(ray, &test_wall, &depth)) { 
-                // DRAW THE VERTICAL LINE
+
+            int sector_index = camera->sector - 1;
+            if (first_hit(ray, sectors[sector_index], sectors, &depth, &hit_id, 0)) {
+                // printf("hit %d\n", hit_id);
+                struct wall *hit_wall = (sectors[sector_index]->walls)[hit_id];
+
                 int line_height = (int) SCR_HEIGHT / depth;
                 int y0 = max((SCR_HEIGHT / 2) - (line_height / 2), 0);
                 int y1 = min((SCR_HEIGHT / 2) + (line_height / 2), SCR_HEIGHT - 1);
 
-                draw_vert(pixel_arr, x, y0, y1, 1.0, 1.0);
+                draw_vert(pixel_arr, x, y0, y1, 0.3, 1.0);
             }
 
             destroy_ray(ray);
@@ -133,6 +133,7 @@ int main(int argc, char *argv[]) {
         glfwPollEvents();
     }
 
+    destroy_sectors(sectors, &n_sectors);
     glfwTerminate();
     free(camera->pos);
     free(camera);

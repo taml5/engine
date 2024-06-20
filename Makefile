@@ -1,4 +1,4 @@
-CFLAGS = -std=gnu99 -lglfw3 -framework CoreVideo -framework OpenGL -framework IOKit -framework Cocoa -framework Carbon
+CFLAGS = -std=gnu99 -O3 -lglfw3 -framework CoreVideo -framework OpenGL -framework IOKit -framework Cocoa -framework Carbon
 
 engine: build/main.o build/graphics.o build/load.o
 	gcc ${CFLAGS} build/main.o build/graphics.o build/load.o -o engine

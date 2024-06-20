@@ -11,11 +11,12 @@
  * @return A pointer to a heap allocated 
  * 
  */
-struct sector *load_sectors(char *filepath, int *n_sectors);
+struct sector **load_sectors(char *filepath, int *n_sectors);
 
 /**
  * Deallocate the sector array.
  * 
  * @param sectors: A pointer to the sector array.
+ * @param n_sectors: The number of sectors loaded.
  */
-void destroy_sectors(struct sector *sectors);
+void destroy_sectors(struct sector **sectors, int *n_sectors);

@@ -25,13 +25,13 @@ struct ray *viewing_ray(struct camera *camera, int x) {
     return ray;
 }
 
-bool intersection(struct ray *ray, struct wall *wall, double *depth) {
+bool intersection(struct ray *ray, struct wall *wall, double *depth, double min_t) {
     // implementation of cramer's rule on the system of linear equations
     // given by equating the parametric equations of both lines
-    double walldir_x = wall->end.x - wall->start.x;
-    double walldir_y = wall->end.y - wall->end.y;
-    double p_min_l_x = ray->origin->x - wall->start.x;
-    double p_min_l_y = ray->origin->y - wall->start.y;
+    double walldir_x = wall->end->x - wall->start->x;
+    double walldir_y = wall->end->y - wall->start->y;
+    double p_min_l_x = ray->origin->x - wall->start->x;
+    double p_min_l_y = ray->origin->y - wall->start->y;
 
     double denom = (walldir_x * ray->direction->y) - (walldir_y * ray->direction->x);
     if (-0.000001f < denom && denom < 0.000001f) {
@@ -45,7 +45,7 @@ bool intersection(struct ray *ray, struct wall *wall, double *depth) {
         return false;
     }
     double t = ((walldir_x * p_min_l_y) - (walldir_y * p_min_l_x)) / denom;
-    if (t < 0) {
+    if (t < min_t) {
         // only need to check if intersection occurs behind camera (t is negative)
         return false;
     }
@@ -54,20 +54,22 @@ bool intersection(struct ray *ray, struct wall *wall, double *depth) {
     return true;
 }
 
-bool first_hit(struct ray *ray, struct sector *sector, double *depth, int *hit_id) {
+bool first_hit(struct ray *ray, struct sector *sector, struct sector **sectors, double *depth, int *hit_id, double min_t) {
     bool hit = false;
     *depth = HUGE_VAL;
-
     double curr_depth;
     for (int i = 0; i < sector->n_walls; i++) {
-        if ((sector->walls[i])->portal != 0) {
-            // TODO: handle the case that the wall is a portal
-            continue;
-        } else if (intersection(ray, sector->walls[i], &curr_depth) && curr_depth < *depth) {
-            hit = true;
-            *hit_id = i;
-            *depth = curr_depth;
+        if (intersection(ray, sector->walls[i], &curr_depth, min_t)) {
+            if (curr_depth < *depth) {
+                hit = true;
+                *hit_id = i;
+                *depth = curr_depth;
+            }
         }
+    }
+
+    if (hit && sector->walls[*hit_id]->portal != 0) {
+        return first_hit(ray, sectors[sector->walls[*hit_id]->portal - 1], sectors, depth, hit_id, *depth + 0.000001);
     }
     return hit;
 }

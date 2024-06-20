@@ -10,9 +10,6 @@
 #define ROTSPD 3.0f * 0.016f  // camera rotating speed
 #define MVTSPD 3.0f * 0.016f  // movement speed
 
-#define MAX_SECTOR 256  // max number of sectors
-#define MAX_WALL 128  // max number of walls in a sector
-
 /**
  * A struct representing a 2D float vector.
  * 

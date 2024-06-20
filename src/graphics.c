@@ -70,12 +70,10 @@ bool first_hit(struct ray *ray,
     *depth = HUGE_VAL;
     double curr_depth;
     for (int i = 0; i < sector->n_walls; i++) {
-        if (intersection(ray, sector->walls[i], min_t, &curr_depth, is_vertex)) {
-            if (curr_depth < *depth) {
-                hit = true;
-                *hit_id = i;
-                *depth = curr_depth;
-            }
+        if (intersection(ray, sector->walls[i], min_t, &curr_depth, is_vertex) && curr_depth < *depth) {
+            hit = true;
+            *hit_id = i;
+            *depth = curr_depth;
         }
     }
 

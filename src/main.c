@@ -60,7 +60,7 @@ int main(int argc, char *argv[]) {
     glfwGetVersion(&major, &minor, &revision);
     printf("Running against GLFW %i.%i.%i\n", major, minor, revision);
 
-    // TODO: load sectors and build sector and wall structs
+    // load sectors and build sector and wall structs
     int n_sectors;
     struct sector **sectors = load_sectors("./content/map.txt", &n_sectors);
 
@@ -108,19 +108,20 @@ int main(int argc, char *argv[]) {
 
             int sector_index = camera->sector - 1;
             if (first_hit(ray, sectors[sector_index], sectors, 0, &is_vertex, &depth, &hit_id)) {
-                // printf("hit %d\n", hit_id);
                 struct wall *hit_wall = (sectors[sector_index]->walls)[hit_id];
 
                 int line_height = (int) SCR_HEIGHT / depth;
                 int y0 = max((SCR_HEIGHT / 2) - (line_height / 2), 0);
                 int y1 = min((SCR_HEIGHT / 2) + (line_height / 2), SCR_HEIGHT - 1);
 
-                if (is_vertex) {
-                    draw_vert(pixel_arr, x, y0, y1, 1.0, 1.0);
-                } else {
-                    draw_vert(pixel_arr, x, y0, y1, 0.3, 1.0);
-                }
                 
+                double clr_coeff = fabs(atan((hit_wall->end->y - hit_wall->start->y) / hit_wall->end->x - hit_wall->start->x));
+                draw_vert(pixel_arr, x, y1, SCR_HEIGHT, 0.2, 1.0);
+                if (is_vertex) {
+                    draw_vert(pixel_arr, x, y0, y1, 0.0, 1.0);
+                } else {
+                    draw_vert(pixel_arr, x, y0, y1, 0.2 + 0.2 * min(max(clr_coeff, 0.0), 1.0), 1.0);
+                }
             }
 
             destroy_ray(ray);

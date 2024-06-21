@@ -9,8 +9,12 @@
 
 #define FOCAL_LEN 1  // the distance from the camera to the image plane, in game units
 
-#define SCR_WIDTH 1280  // screen width
-#define SCR_HEIGHT 720  // screen height
+#define SCR_WIDTH 640  // screen width
+#define SCR_HEIGHT 480  // screen height
+
+#define FUDGE 1e-6  // fudge factor to avoid floating point errors
+#define EDGE_LIM 0.003  // limit for edge detection
+#define WORLD2CAM(x) (-1 + (2 * (x + 0.5)) / SCR_WIDTH)   // transformation from world plane to image plane
 
 /**
  * Draw a vertical line from (x, y0) to (x, y1) in the pixel buffer, with luminance `lum`
@@ -79,7 +83,8 @@ bool intersection(struct ray *ray, struct wall *wall, double min_t, double *dept
  * @param is_vertex: 
  * @param depth: The distance from the camera to the colliding wall.
  * @param hit_id: The id of the intersecting wall.
+ * @param hit_sector: The id of the sector containing the intersecting wall.
  * 
  * @return Whether there was an intersection or not.
  */
-bool first_hit(struct ray *ray, struct sector *sector, struct sector **sectors, double min_t, bool *is_vertex, double *depth, int *hit_id);
+bool first_hit(struct ray *ray, struct sector *sector, struct sector **sectors, double min_t, bool *is_vertex, double *depth, int *hit_id, int *hit_sector);

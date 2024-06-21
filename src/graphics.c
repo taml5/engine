@@ -1,9 +1,5 @@
 #include "graphics.h"
 
-#define FUDGE 1e-6  // fudge factor to avoid floating point errors
-#define EDGE_LIM 0.003  // limit for edge detection
-#define WORLD2CAM(x) (-1 + (2 * (x + 0.5)) / SCR_WIDTH)   // transformation from world plane to image plane
-
 void draw_vert(float *pixel_arr, int x, int y0, int y1, float lum, float alpha) {
     for (int i = y0; i < y1; i++) {
         pixel_arr[2 * (i * SCR_WIDTH + x)] = lum;
@@ -65,9 +61,11 @@ bool first_hit(struct ray *ray,
                double min_t, 
                bool *is_vertex, 
                double *depth, 
-               int *hit_id) {
+               int *hit_id,
+               int *hit_sector) {
     bool hit = false;
     *depth = HUGE_VAL;
+    *hit_sector = sector->id;
     double curr_depth;
     for (int i = 0; i < sector->n_walls; i++) {
         if (intersection(ray, sector->walls[i], min_t, &curr_depth, is_vertex) && curr_depth < *depth) {
@@ -84,7 +82,8 @@ bool first_hit(struct ray *ray,
                          *depth + FUDGE, 
                          is_vertex, 
                          depth, 
-                         hit_id);
+                         hit_id,
+                         hit_sector);
     }
     return hit;
 }

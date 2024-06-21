@@ -101,26 +101,35 @@ int main(int argc, char *argv[]) {
         memset(pixel_arr, 0, sizeof(float) * 2 * SCR_HEIGHT * SCR_WIDTH);  // reset pixel buffer
 
         double depth;
-        int hit_id;
+        int hit_id, hit_sector;
         bool is_vertex;
         for (int x = 0; x < SCR_WIDTH; x++) {
             struct ray *ray = viewing_ray(camera, x);
 
             int sector_index = camera->sector - 1;
-            if (first_hit(ray, sectors[sector_index], sectors, 0, &is_vertex, &depth, &hit_id)) {
-                struct wall *hit_wall = (sectors[sector_index]->walls)[hit_id];
+            if (first_hit(ray, sectors[sector_index], sectors, 0, &is_vertex, &depth, &hit_id, &hit_sector)) {
+                struct wall *hit_wall = (sectors[hit_sector - 1]->walls)[hit_id];
 
                 int line_height = (int) SCR_HEIGHT / depth;
                 int y0 = max((SCR_HEIGHT / 2) - (line_height / 2), 0);
                 int y1 = min((SCR_HEIGHT / 2) + (line_height / 2), SCR_HEIGHT - 1);
 
+                // calculate colour based on angle to x-axis
+                double clr_coeff;
+                double x_dir = hit_wall->end->x - hit_wall->start->x;
+                double y_dir = hit_wall->end->y - hit_wall->start->y;
+                if (fabs(y_dir) < FUDGE) {
+                    clr_coeff = PI / 2;
+                } else {
+                    clr_coeff = atan(y_dir / x_dir);
+                }
+                clr_coeff = (clr_coeff + (PI / 2)) / PI;
                 
-                double clr_coeff = fabs(atan((hit_wall->end->y - hit_wall->start->y) / hit_wall->end->x - hit_wall->start->x));
                 draw_vert(pixel_arr, x, y1, SCR_HEIGHT, 0.2, 1.0);
                 if (is_vertex) {
                     draw_vert(pixel_arr, x, y0, y1, 0.0, 1.0);
                 } else {
-                    draw_vert(pixel_arr, x, y0, y1, 0.2 + 0.2 * min(max(clr_coeff, 0.0), 1.0), 1.0);
+                    draw_vert(pixel_arr, x, y0, y1, 0.3 + 0.2 * clr_coeff, 1.0);
                 }
             }
 

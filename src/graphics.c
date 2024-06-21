@@ -1,5 +1,33 @@
 #include "graphics.h"
 
+float dot(struct vec2 *a, struct vec2 *b) {
+    return (a->x * b->x) + (a->y * b->y);
+}
+
+float doti(struct vec2i *a, struct vec2i *b) {
+    return (a->x * b->x) + (a->y * b->y);
+}
+
+struct vec2 normalise(struct vec2 *v) {
+    float invsqrt = 1 / pow(powf(v->x, 2.0) + powf(v->y, 2.0), 0.5);
+
+    return (struct vec2) { 
+        invsqrt * v->x,
+        invsqrt * v->y
+    };
+}
+
+/**
+ * TODO: document this function
+ */
+struct vec2 wall_norm(struct wall *wall) {
+    float walldir_x = wall->end->x - wall->start->x;
+    float walldir_y = wall->end->y - wall->start->y;
+
+    struct vec2 walln = {walldir_y, -walldir_x};
+    return normalise(&walln);
+}
+
 void draw_vert(float *pixel_arr, int x, int y0, int y1, float lum, float alpha) {
     for (int i = y0; i < y1; i++) {
         pixel_arr[2 * (i * SCR_WIDTH + x)] = lum;
@@ -86,4 +114,14 @@ bool first_hit(struct ray *ray,
                          hit_sector);
     }
     return hit;
+}
+
+float lambertian(struct ray *ray, struct vec2 *light_pt, float depth, struct wall *wall, float intensity) {
+    struct vec2 n = wall_norm(wall);
+    struct vec2 q = {
+        -((ray->origin->x - depth * ray->direction->x) - light_pt->x), 
+        -((ray->origin->y - depth * ray->direction->y) - light_pt->y)
+    };
+    struct vec2 light = normalise(&q);
+    return intensity * max(dot(&light, &n), 0.0);
 }

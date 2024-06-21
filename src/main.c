@@ -73,7 +73,7 @@ int main(int argc, char *argv[]) {
     camera->pos = malloc(sizeof(struct vec2));
     camera->pos->x = 2;
     camera->pos->y = 2;
-    camera->angle = 0;
+    camera->angle = PI;
     camera->anglecos = cos(camera->angle);
     camera->anglesin = sin(camera->angle);
     camera->sector = 1;
@@ -110,21 +110,22 @@ int main(int argc, char *argv[]) {
             if (first_hit(ray, sectors[sector_index], sectors, FUDGE, &is_vertex, &depth, &hit_id, &hit_sector)) {
                 struct wall *hit_wall = (sectors[hit_sector - 1]->walls)[hit_id];
 
+                // calculate depth effect
                 int line_height = (int) SCR_HEIGHT / depth;
                 int y0 = max((SCR_HEIGHT / 2) - (line_height / 2), 0);
                 int y1 = min((SCR_HEIGHT / 2) + (line_height / 2), SCR_HEIGHT - 1);
 
                 // calculate colour based on angle to x-axis
-                double clr_coeff;
-                double x_dir = (double) hit_wall->end->x - (double) hit_wall->start->x;
-                double y_dir = (double) hit_wall->end->y - (double) hit_wall->start->y;
-                clr_coeff = (fmod(atan2(y_dir, x_dir), PI) + PI / (2 * PI));
+                struct vec2 light = {1.5, 1.5};
+                float lambertian_coeff = 0;
+                lambertian_coeff += lambertian(ray, &light, depth, hit_wall, 0.2);
+                // lambertian_coeff += lambertian(ray, camera->pos, depth, hit_wall, 0.1);
                 
                 draw_vert(pixel_arr, x, y1, SCR_HEIGHT, 0.15, 1.0);
                 if (is_vertex) {
                     draw_vert(pixel_arr, x, y0, y1, 0.0, 1.0);
                 } else {
-                    draw_vert(pixel_arr, x, y0, y1, 0.2 + 0.4 * max(min(clr_coeff, 1.0), 0.0), 1.0);
+                    draw_vert(pixel_arr, x, y0, y1, max(AMBIENT + lambertian_coeff, 0.0), 1.0);
                 }
             }
 

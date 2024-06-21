@@ -9,12 +9,34 @@
 
 #define FOCAL_LEN 1  // the distance from the camera to the image plane, in game units
 
-#define SCR_WIDTH 640  // screen width
-#define SCR_HEIGHT 480  // screen height
+#define SCR_WIDTH 1280  // screen width
+#define SCR_HEIGHT 720  // screen height
 
 #define FUDGE 1e-6  // fudge factor to avoid floating point errors
-#define EDGE_LIM 0.003  // limit for edge detection
+#define EDGE_LIM 0.004  // limit for edge detection
 #define WORLD2CAM(x) (-1 + (2 * (x + 0.5)) / SCR_WIDTH)   // transformation from world plane to image plane
+
+#define AMBIENT 0.05  // the ambient light intensity value
+
+/**
+ * Return the dot product between the vectors a and b.
+ */
+float dot(struct vec2 *a, struct vec2 *b);
+
+/**
+ * Return the dot product between the integer vectors a and b.
+ */
+float doti(struct vec2i *a, struct vec2i *b);
+
+/**
+ * TODO:
+ */
+struct vec2 normalise(struct vec2 *v);
+
+/**
+ * TODO:
+ */
+struct vec2 wall_norm(struct wall *wall);
 
 /**
  * Draw a vertical line from (x, y0) to (x, y1) in the pixel buffer, with luminance `lum`
@@ -88,3 +110,8 @@ bool intersection(struct ray *ray, struct wall *wall, double min_t, double *dept
  * @return Whether there was an intersection or not.
  */
 bool first_hit(struct ray *ray, struct sector *sector, struct sector **sectors, double min_t, bool *is_vertex, double *depth, int *hit_id, int *hit_sector);
+
+/**
+ * TODO: document this function
+ */
+float lambertian(struct ray *ray, struct vec2 *light_pt, float depth, struct wall *wall, float intensity);

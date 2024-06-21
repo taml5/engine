@@ -107,7 +107,7 @@ int main(int argc, char *argv[]) {
             struct ray *ray = viewing_ray(camera, x);
 
             int sector_index = camera->sector - 1;
-            if (first_hit(ray, sectors[sector_index], sectors, 0, &is_vertex, &depth, &hit_id, &hit_sector)) {
+            if (first_hit(ray, sectors[sector_index], sectors, FUDGE, &is_vertex, &depth, &hit_id, &hit_sector)) {
                 struct wall *hit_wall = (sectors[hit_sector - 1]->walls)[hit_id];
 
                 int line_height = (int) SCR_HEIGHT / depth;
@@ -116,20 +116,15 @@ int main(int argc, char *argv[]) {
 
                 // calculate colour based on angle to x-axis
                 double clr_coeff;
-                double x_dir = hit_wall->end->x - hit_wall->start->x;
-                double y_dir = hit_wall->end->y - hit_wall->start->y;
-                if (fabs(y_dir) < FUDGE) {
-                    clr_coeff = PI / 2;
-                } else {
-                    clr_coeff = atan(y_dir / x_dir);
-                }
-                clr_coeff = (clr_coeff + (PI / 2)) / PI;
+                double x_dir = (double) hit_wall->end->x - (double) hit_wall->start->x;
+                double y_dir = (double) hit_wall->end->y - (double) hit_wall->start->y;
+                clr_coeff = (fmod(atan2(y_dir, x_dir), PI) + PI / (2 * PI));
                 
-                draw_vert(pixel_arr, x, y1, SCR_HEIGHT, 0.2, 1.0);
+                draw_vert(pixel_arr, x, y1, SCR_HEIGHT, 0.15, 1.0);
                 if (is_vertex) {
                     draw_vert(pixel_arr, x, y0, y1, 0.0, 1.0);
                 } else {
-                    draw_vert(pixel_arr, x, y0, y1, 0.3 + 0.2 * clr_coeff, 1.0);
+                    draw_vert(pixel_arr, x, y0, y1, 0.2 + 0.4 * max(min(clr_coeff, 1.0), 0.0), 1.0);
                 }
             }
 

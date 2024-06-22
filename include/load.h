@@ -8,7 +8,7 @@
  * 
  * @param filepath: The filepath to read the map data from.
  * @param n_sectors: The number of sectors loaded.
- * @return A pointer to a heap allocated 
+ * @return A pointer to a heap allocated sector array.
  * 
  */
 struct sector **load_sectors(char *filepath, int *n_sectors);

@@ -85,7 +85,7 @@ void destroy_ray(struct ray *ray);
  * 
  * @param ray: The viewing ray.
  * @param wall: The wall which an intersection is to be checked with.
- * @param min_t:  
+ * @param min_t: The minimum depth considered.
  * @param depth: The "depth" of the intersection, that is, the distance between the camera and the 
  *               wall, given in the basis of the focal length.
  * @param is_vertex:

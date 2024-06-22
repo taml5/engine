@@ -16,7 +16,7 @@ bool collision(struct camera *camera, struct wall *wall, struct vec2 *new) {
         return false;
     }
     double s = (c1 * walldir_y - walldir_x * c2) / denom;
-    if (s < -1 || s > 2) {
+    if (s < 0 || s > 1) {
         return false;
     }
     double t = (posdir_x * c2 - c1 * posdir_y) / denom;
@@ -37,7 +37,6 @@ bool update_location(struct camera *camera,
         struct wall *wall = sectors[camera->sector - 1]->walls[i];
         if (collision(camera, wall, new)) {
             if (wall->portal != 0) {
-                // TODO: find a way to stop player from standing inside a portal
                 camera->sector = wall->portal;
                 return true;
             } else {

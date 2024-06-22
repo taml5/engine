@@ -1,7 +1,7 @@
 # engine
 
-- [ ] Tracking player sector
-- [ ] Add collision to walls
-- [ ] Lighting
+- [X] Tracking player sector
+- [X] Add collision to walls
+- [X] Lighting
 - [ ] Texture mapping
 - [ ] Dithering filter

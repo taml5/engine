@@ -7,6 +7,8 @@
 #include <math.h>
 #include <stdbool.h>
 
+#define FUDGE 1e-6  // fudge factor to avoid floating point errors
+
 #define ROTSPD 3.0f * 0.016f  // camera rotating speed
 #define MVTSPD 3.0f * 0.016f  // movement speed
 
@@ -77,3 +79,10 @@ struct camera {
     int sector;
     float angle, anglecos, anglesin;
 };
+
+/**
+ * TODO: document this function
+ */
+bool update_location(struct camera *camera,
+                     struct sector **sectors,
+                     struct vec2 *new);

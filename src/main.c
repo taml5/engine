@@ -11,7 +11,10 @@
  * @param window: A pointer to the GLFW window struct.
  * @param camera: A pointer to the camera struct.
  */
-void process_input(GLFWwindow *window, struct camera *camera)
+void process_input(GLFWwindow *window, 
+                   struct camera *camera, 
+                   struct sector **sectors,
+                   struct vec2 *new)
 {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
         glfwSetWindowShouldClose(window, 1);
@@ -30,23 +33,23 @@ void process_input(GLFWwindow *window, struct camera *camera)
     }
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
         // go back
-        camera->pos->x += MVTSPD * camera->anglecos;
-        camera->pos->y += MVTSPD * camera->anglesin;
+        new->x = camera->pos->x + MVTSPD * camera->anglecos;
+        new->y = camera->pos->y + MVTSPD * camera->anglesin;
     }
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
         // go forward
-        camera->pos->x -= MVTSPD * camera->anglecos;
-        camera->pos->y -= MVTSPD * camera->anglesin;
+        new->x = camera->pos->x - MVTSPD * camera->anglecos;
+        new->y = camera->pos->y - MVTSPD * camera->anglesin;
     }
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
         // go left
-        camera->pos->x -= MVTSPD * camera->anglesin;
-        camera->pos->y += MVTSPD * camera->anglecos;
+        new->x = camera->pos->x - MVTSPD * camera->anglesin;
+        new->y = camera->pos->y + MVTSPD * camera->anglecos;
     }
     if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
         // go right
-        camera->pos->x += MVTSPD * camera->anglesin;
-        camera->pos->y -= MVTSPD * camera->anglecos;
+        new->x = camera->pos->x + MVTSPD * camera->anglesin;
+        new->y = camera->pos->y - MVTSPD * camera->anglecos;
     }
 }
 
@@ -78,6 +81,8 @@ int main(int argc, char *argv[]) {
     camera->anglesin = sin(camera->angle);
     camera->sector = 1;
 
+    struct vec2 new;
+
     // create the engine window
     GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "engine", NULL, NULL);
     if (!window)
@@ -94,7 +99,12 @@ int main(int argc, char *argv[]) {
 
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window)) {
-        process_input(window, camera);
+        process_input(window, camera, sectors, &new);
+
+        if (update_location(camera, sectors, &new)) {
+            camera->pos->x = new.x;
+            camera->pos->y = new.y;
+        }
 
         /* Render here */
         glClear(GL_COLOR_BUFFER_BIT);
@@ -135,7 +145,7 @@ int main(int argc, char *argv[]) {
         // TODO: apply dithering filter
 
         // draw pixels
-        glPixelZoom(2, 2);
+        // glPixelZoom(2, 2);
         glDrawPixels(SCR_WIDTH, SCR_HEIGHT, GL_LUMINANCE_ALPHA, GL_FLOAT, pixel_arr);
 
         /* Swap front and back buffers */

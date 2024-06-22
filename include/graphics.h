@@ -12,7 +12,6 @@
 #define SCR_WIDTH 1280  // screen width
 #define SCR_HEIGHT 720  // screen height
 
-#define FUDGE 1e-6  // fudge factor to avoid floating point errors
 #define EDGE_LIM 0.004  // limit for edge detection
 #define WORLD2CAM(x) (-1 + (2 * (x + 0.5)) / SCR_WIDTH)   // transformation from world plane to image plane
 

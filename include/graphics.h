@@ -28,12 +28,12 @@ float dot(struct vec2 *a, struct vec2 *b);
 float doti(struct vec2i *a, struct vec2i *b);
 
 /**
- * TODO:
+ * Return a normalised version of the given vector v.
  */
 struct vec2 normalise(struct vec2 *v);
 
 /**
- * TODO:
+ * Return the clockwise normal to the wall.
  */
 struct vec2 wall_norm(struct wall *wall);
 
@@ -111,6 +111,13 @@ bool intersection(struct ray *ray, struct wall *wall, double min_t, double *dept
 bool first_hit(struct ray *ray, struct sector *sector, struct sector **sectors, double min_t, bool *is_vertex, double *depth, int *hit_id, int *hit_sector);
 
 /**
- * TODO: document this function
+ * Calculate the luminosity given by the wall from the light at `light_pt` with intensity `intensity` using
+ * the Lambertian model.
+ * 
+ * @param ray: The viewing ray that hits the wall.
+ * @param light_pt: The position of the light.
+ * @param depth: The distance from the camera to the wall.
+ * @param wall: The wall.
+ * @param intensity: The intensity of light.
  */
 float lambertian(struct ray *ray, struct vec2 *light_pt, float depth, struct wall *wall, float intensity);

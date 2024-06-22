@@ -12,6 +12,8 @@
 #define ROTSPD 3.0f * 0.016f  // camera rotating speed
 #define MVTSPD 3.0f * 0.016f  // movement speed
 
+#define CAM_HEIGHT 
+
 /**
  * A struct representing a 2D float vector.
  * 
@@ -81,7 +83,12 @@ struct camera {
 };
 
 /**
- * TODO: document this function
+ * Update the camera's location and sector if necessary. Returns whether the camera's position
+ * has changed.
+ * 
+ * @param camera: The camera.
+ * @param sectors: The array of sectors in the map.
+ * @param new: The new position of the camera to be checked.
  */
 bool update_location(struct camera *camera,
                      struct sector **sectors,

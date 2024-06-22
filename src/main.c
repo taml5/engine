@@ -129,7 +129,7 @@ int main(int argc, char *argv[]) {
                 struct vec2 light = {1.5, 1.5};
                 float lambertian_coeff = 0;
                 lambertian_coeff += lambertian(ray, &light, depth, hit_wall, 0.2);
-                // lambertian_coeff += lambertian(ray, camera->pos, depth, hit_wall, 0.1);
+                lambertian_coeff += lambertian(ray, camera->pos, depth, hit_wall, min(0.4 / powf(depth, 2.0), 0.5));
                 
                 draw_vert(pixel_arr, x, y1, SCR_HEIGHT, 0.15, 1.0);
                 if (is_vertex) {

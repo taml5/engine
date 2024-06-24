@@ -13,8 +13,9 @@
  * @param camera: The camera.
  * @param wall: The wall to check for an intersection.
  * @param new: The new position of the camera.
+ * @param t: The parameter for the wall parametric equation..
  */
-bool collision(struct camera *camera, struct wall *wall, struct vec2 *new) {
+bool collision(struct camera *camera, struct wall *wall, struct vec2 *new, double *t) {
     double walldir_x = wall->end->x - wall->start->x;
     double walldir_y = wall->end->y - wall->start->y;
     double posdir_x = new->x - camera->pos->x;
@@ -30,10 +31,11 @@ bool collision(struct camera *camera, struct wall *wall, struct vec2 *new) {
     if (s < 0 || s > 1) {
         return false;
     }
-    double t = (posdir_x * c2 - c1 * posdir_y) / denom;
-    if (t < -1 || t > 2) {
+    double param = (posdir_x * c2 - c1 * posdir_y) / denom;
+    if (param < -1 || param > 0) {
         return false;
     }
+    *t = param;
     return true;
 }
 
@@ -44,10 +46,13 @@ bool update_location(struct camera *camera,
         return false;
     }
 
+    double t;
     for (int i = 0; i < sectors[camera->sector - 1]->n_walls; i++) {
         struct wall *wall = sectors[camera->sector - 1]->walls[i];
-        if (collision(camera, wall, new)) {
-            if (wall->portal != 0) {
+        if (collision(camera, wall, new, &t)) {
+            if (wall->portal != 0 && (t < -1.0 + 0.1 || t > 0.0 - 0.1)) {
+                return false;
+            } else if (wall->portal != 0) {
                 camera->sector = wall->portal;
                 return true;
             } else {

@@ -41,10 +41,11 @@ struct vec2 wall_norm(struct wall *wall) {
     return normalise(&walln);
 }
 
-void draw_vert(float *pixel_arr, int x, int y0, int y1, float lum, float alpha) {
+void draw_vert(float *pixel_arr, int x, int y0, int y1, float r, float g, float b) {
     for (int i = y0; i < y1; i++) {
-        pixel_arr[2 * (i * SCR_WIDTH + x)] = lum;
-        pixel_arr[2 * (i * SCR_WIDTH + x) + 1] = alpha;
+        pixel_arr[3 * (i * SCR_WIDTH + x) + 0] = r;
+        pixel_arr[3 * (i * SCR_WIDTH + x) + 1] = g;
+        pixel_arr[3 * (i * SCR_WIDTH + x) + 2] = b;
     }
 }
 

@@ -69,8 +69,8 @@ int main(int argc, char *argv[]) {
     struct sector **sectors = load_sectors("./content/map.txt", &n_sectors);
 
     // initialise pixel buffer storing luminance and alpha
-    float *pixel_arr = malloc(sizeof(float) * SCR_WIDTH * SCR_HEIGHT * 2);
-    memset(pixel_arr, 0, sizeof(float) * 2 * SCR_HEIGHT * SCR_WIDTH);
+    float *pixel_arr = malloc(sizeof(float) * SCR_WIDTH * SCR_HEIGHT * 3);
+    // memset(pixel_arr, 0, sizeof(float) * 3 * SCR_HEIGHT * SCR_WIDTH);
 
     // initialise camera
     struct camera *camera = malloc(sizeof(struct camera));
@@ -110,7 +110,7 @@ int main(int argc, char *argv[]) {
 
         /* Render here */
         glClear(GL_COLOR_BUFFER_BIT);
-        memset(pixel_arr, 0, sizeof(float) * 2 * SCR_HEIGHT * SCR_WIDTH);  // reset pixel buffer
+        // memset(pixel_arr, 0, sizeof(float) * 3 * SCR_HEIGHT * SCR_WIDTH);  // reset pixel buffer
 
         double depth;
         int hit_id, hit_sector;
@@ -133,12 +133,13 @@ int main(int argc, char *argv[]) {
                 lambertian_coeff += lambertian(ray, &light, depth, hit_wall, 0.2);
                 lambertian_coeff += lambertian(ray, camera->pos, depth, hit_wall, min(0.4 / powf(depth, 2.0), 0.3));
                 
-                draw_vert(pixel_arr, x, y1, SCR_HEIGHT, 0.15, 1.0);
+                draw_vert(pixel_arr, x, y1, SCR_HEIGHT, 0.15, 0.15, 0.15);
                 if (is_vertex) {
-                    draw_vert(pixel_arr, x, y0, y1, 1.0, 1.0);
+                    draw_vert(pixel_arr, x, y0, y1, 0.4, 0.0, 0.0);
                 } else {
-                    draw_vert(pixel_arr, x, y0, y1, max(AMBIENT + lambertian_coeff, 0.0), 1.0);
+                    draw_vert(pixel_arr, x, y0, y1, max(AMBIENT + lambertian_coeff, 0.0), max(AMBIENT + lambertian_coeff, 0.0), max(AMBIENT + lambertian_coeff, 0.0));
                 }
+                draw_vert(pixel_arr, x, 0, y0, 0.0, 0.0, 0.0);
             }
 
             destroy_ray(ray);
@@ -147,7 +148,7 @@ int main(int argc, char *argv[]) {
         // TODO: apply dithering filter
 
         // draw pixels
-        glDrawPixels(SCR_WIDTH, SCR_HEIGHT, GL_LUMINANCE_ALPHA, GL_FLOAT, pixel_arr);
+        glDrawPixels(SCR_WIDTH, SCR_HEIGHT, GL_RGB, GL_FLOAT, pixel_arr);
 
         /* Swap front and back buffers */
         glfwSwapBuffers(window);

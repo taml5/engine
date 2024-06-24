@@ -9,8 +9,8 @@
 
 #define FOCAL_LEN 1  // the distance from the camera to the image plane, in game units
 
-#define SCR_WIDTH 1280  // screen width
-#define SCR_HEIGHT 720  // screen height
+#define SCR_WIDTH 640  // screen width
+#define SCR_HEIGHT 480  // screen height
 
 #define EDGE_LIM 0.004  // limit for edge detection
 #define WORLD2CAM(x) (-1 + (2 * (x + 0.5)) / SCR_WIDTH)   // transformation from world plane to image plane
@@ -59,7 +59,7 @@ struct vec2 wall_norm(struct wall *wall);
  * @param lum: The luminance of the line.
  * @param alpha: The alpha of the line.
  */
-void draw_vert(float *pixel_arr, int x, int y0, int y1, float lum, float alpha);
+void draw_vert(float *pixel_arr, int x, int y0, int y1, float r, float g, float b);
 
 /**
  * A struct representing a ray described parametrically.

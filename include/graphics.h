@@ -28,6 +28,17 @@ float dot(struct vec2 *a, struct vec2 *b);
 float doti(struct vec2i *a, struct vec2i *b);
 
 /**
+ * https://en.wikipedia.org/wiki/Fast_inverse_square_root
+ * 
+ * The fast inverse square root algorithm from Quake III. Directly
+ * copied from wikipedia except the type of i is changed from `long` to `int`.
+ * 
+ * @param number: A number.
+ * @return The inverse square root of the number.
+ */
+float Q_rsqrt(float number);
+
+/**
  * Return a normalised version of the given vector v.
  */
 struct vec2 normalise(struct vec2 *v);

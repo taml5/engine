@@ -2,6 +2,10 @@
 #define GAME
 #include "game.h"
 #endif
+#ifndef GRAPHICS
+#define GRAPHICS
+#include "graphics.h"
+#endif
 
 /**
  * Return whether the wall intersects the camera's path.
@@ -47,7 +51,19 @@ bool update_location(struct camera *camera,
                 camera->sector = wall->portal;
                 return true;
             } else {
-                return false;
+                // calculate the resulting direction component along wall
+                struct vec2 direction = {
+                    new->x - camera->pos->x,
+                    new->y - camera->pos->y
+                };
+                struct vec2 walldir = {
+                    wall->end->x - wall->start->x,
+                    wall->end->y - wall->start->y
+                };
+                float len = dot(&walldir, &direction) * Q_rsqrt(pow(walldir.x, 2.0) + pow(walldir.y, 2.0));
+                new->x = camera->pos->x + 0.5 * len * walldir.x;
+                new->y = camera->pos->y + 0.5 * len * walldir.y;
+                return update_location(camera, sectors, new);
             }
         }
     }

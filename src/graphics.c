@@ -8,17 +8,7 @@ float doti(struct vec2i *a, struct vec2i *b) {
     return (a->x * b->x) + (a->y * b->y);
 }
 
-/**
- * https://en.wikipedia.org/wiki/Fast_inverse_square_root
- * 
- * The fast inverse square root algorithm from Quake III. Directly
- * copied from wikipedia except the type of i is changed from `long` to `int`.
- * 
- * @param number: A number.
- * @return The inverse square root of the number.
- */
-float Q_rsqrt(float number)
-{
+float Q_rsqrt(float number) {
   int i;
   float x2, y;
   const float threehalfs = 1.5F;

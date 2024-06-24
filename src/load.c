@@ -56,7 +56,9 @@ void destroy_sectors(struct sector **sectors, int *n_sectors) {
             free(wall->end);
             free(wall);
         }
+        free(sectors[i]->walls);
         free(sectors[i]);
     }
+    free(sectors);
     return;
 }

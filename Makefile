@@ -19,8 +19,8 @@ build/game.o: src/game.c include/game.h
 .PHONY: debug clean
 	
 
-debug: main.o graphics.o
-	gcc -D DEBUG ${CFLAGS} build/main.o build/graphics.o -o engine
+debug: build/main.o build/graphics.o build/load.o build/game.o
+	gcc -D DEBUG ${CFLAGS} build/main.o build/graphics.o build/load.o build/game.o -o engine
 
 clean:
 	rm -r ./build/

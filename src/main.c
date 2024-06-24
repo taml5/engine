@@ -54,6 +54,7 @@ void process_input(GLFWwindow *window,
 }
 
 int main(int argc, char *argv[]) {
+    int fps = 0;
     if (!glfwInit()) {
         fprintf(stderr, "Error: GLFW failed to initialize\n");
         exit(1);
@@ -68,7 +69,7 @@ int main(int argc, char *argv[]) {
     struct sector **sectors = load_sectors("./content/map.txt", &n_sectors);
 
     // initialise pixel buffer storing luminance and alpha
-    float pixel_arr[SCR_WIDTH * SCR_HEIGHT * 2];
+    float *pixel_arr = malloc(sizeof(float) * SCR_WIDTH * SCR_HEIGHT * 2);
     memset(pixel_arr, 0, sizeof(float) * 2 * SCR_HEIGHT * SCR_WIDTH);
 
     // initialise camera
@@ -153,11 +154,16 @@ int main(int argc, char *argv[]) {
 
         /* Poll for and process events */
         glfwPollEvents();
+
+        fps++;
     }
 
     destroy_sectors(sectors, &n_sectors);
     glfwTerminate();
     free(camera->pos);
     free(camera);
+    free(pixel_arr);
+
+    printf("frames=%d\n", fps);
     return 0;
 }

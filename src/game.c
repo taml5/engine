@@ -52,7 +52,7 @@ bool update_location(struct camera *camera,
         if (collision(camera, wall, new, &t)) {
             if (wall->portal != 0 && (t < -1.0 + 0.1 || t > 0.0 - 0.1)) {
                 return false;
-            } else if (wall->portal != 0) {
+            } else if (wall->portal != 0 && fabs(sectors[camera->sector - 1]->floor_z  - sectors[wall->portal - 1]->floor_z) < 1.0) {
                 camera->sector = wall->portal;
                 return true;
             } else {

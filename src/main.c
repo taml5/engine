@@ -82,6 +82,7 @@ int main(int argc, char *argv[]) {
     camera->sector = 1;
 
     struct vec2 new;
+    glfwWindowHint(GLFW_COCOA_RETINA_FRAMEBUFFER, GLFW_FALSE);
 
     // create the engine window
     GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "engine", NULL, NULL);
@@ -129,11 +130,11 @@ int main(int argc, char *argv[]) {
                 struct vec2 light = {1.5, 1.5};
                 float lambertian_coeff = 0;
                 lambertian_coeff += lambertian(ray, &light, depth, hit_wall, 0.2);
-                lambertian_coeff += lambertian(ray, camera->pos, depth, hit_wall, min(0.4 / powf(depth, 2.0), 0.5));
+                lambertian_coeff += lambertian(ray, camera->pos, depth, hit_wall, min(0.4 / powf(depth, 2.0), 0.3));
                 
                 draw_vert(pixel_arr, x, y1, SCR_HEIGHT, 0.15, 1.0);
                 if (is_vertex) {
-                    draw_vert(pixel_arr, x, y0, y1, 0.0, 1.0);
+                    draw_vert(pixel_arr, x, y0, y1, 1.0, 1.0);
                 } else {
                     draw_vert(pixel_arr, x, y0, y1, max(AMBIENT + lambertian_coeff, 0.0), 1.0);
                 }
@@ -145,7 +146,6 @@ int main(int argc, char *argv[]) {
         // TODO: apply dithering filter
 
         // draw pixels
-        // glPixelZoom(2, 2);
         glDrawPixels(SCR_WIDTH, SCR_HEIGHT, GL_LUMINANCE_ALPHA, GL_FLOAT, pixel_arr);
 
         /* Swap front and back buffers */

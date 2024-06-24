@@ -17,9 +17,6 @@ struct vec2 normalise(struct vec2 *v) {
     };
 }
 
-/**
- * TODO: document this function
- */
 struct vec2 wall_norm(struct wall *wall) {
     float walldir_x = wall->end->x - wall->start->x;
     float walldir_y = wall->end->y - wall->start->y;

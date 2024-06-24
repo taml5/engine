@@ -9,8 +9,8 @@
 
 #define FUDGE 1e-6  // fudge factor to avoid floating point errors
 
-#define ROTSPD 3.0f * 0.016f  // camera rotating speed
-#define MVTSPD 3.0f * 0.016f  // movement speed
+#define ROTSPD 2.0f * 0.016f  // camera rotating speed
+#define MVTSPD 1.5f * 0.016f  // movement speed
 
 #define CAM_HEIGHT 
 

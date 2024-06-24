@@ -7,3 +7,4 @@
 - [ ] Add sector heights
 - [ ] Texture mapping
 - [ ] Dithering filter
+- [ ] Sprites

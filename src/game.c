@@ -31,8 +31,8 @@ bool collision(struct camera *camera, struct wall *wall, struct vec2 *new, doubl
     if (s < 0 + FUDGE || s > 1) {
         return false;
     }
-    double param = (posdir_x * c2 - c1 * posdir_y) / denom;
-    if (param < -1 || param > 0) {
+    double param = (c1 * posdir_y - posdir_x * c2) / denom;
+    if (param < 0 || param > 1) {
         return false;
     }
     *t = param;
@@ -51,7 +51,7 @@ bool update_location(struct camera *camera,
     for (int i = 0; i < sectors[camera->sector - 1]->n_walls; i++) {
         struct wall *wall = sectors[camera->sector - 1]->walls[i];
         if (collision(camera, wall, new, &t)) {
-            if (wall->portal != 0 && (t < -1.0 + 0.01|| t > 0.0 - 0.01)) {
+            if (wall->portal != 0 && (t <= 0 + 0.005 || t >= 1 - 0.005)) {
                 return false;
             } else if (wall->portal != 0 && fabs(sectors[camera->sector - 1]->floor_z  - sectors[wall->portal - 1]->floor_z) < 1.0) {
                 camera->sector = wall->portal;

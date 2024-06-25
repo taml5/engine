@@ -123,6 +123,7 @@ int main(int argc, char *argv[]) {
                 struct wall *hit_wall = (sectors[hit_sector - 1]->walls)[hit_id];
 
                 // calculate depth effect
+                // TODO: calculate heights of ceiling and floors as well
                 int line_height = (int) SCR_HEIGHT / depth;
                 int y0 = max((SCR_HEIGHT / 2) - (line_height / 2), 0);
                 int y1 = min((SCR_HEIGHT / 2) + (line_height / 2), SCR_HEIGHT - 1);

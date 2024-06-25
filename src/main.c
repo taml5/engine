@@ -4,6 +4,7 @@
 #endif
 #include "graphics.h"
 #include "load.h"
+#include "bayer.h"
 
 /**
  * Process the inputs of the user and perform different actions based on them.
@@ -131,22 +132,35 @@ int main(int argc, char *argv[]) {
                 // calculate colour based on angle to x-axis
                 struct vec2 light = {1.5, 1.5};
                 float lambertian_coeff = 0;
-                lambertian_coeff += lambertian(ray, &light, depth, hit_wall, 0.2);
+                lambertian_coeff += lambertian(ray, &light, depth, hit_wall, 0.1);
                 lambertian_coeff += lambertian(ray, camera->pos, depth, hit_wall, min(0.4 / powf(depth, 2.0), 0.3));
                 
-                draw_vert(pixel_arr, x, y1, SCR_HEIGHT, 0.15, 0.15, 0.15);
+                draw_vert(pixel_arr, x, y1, SCR_HEIGHT, 0.0, 0.0, 0.1);
                 if (is_vertex) {
-                    draw_vert(pixel_arr, x, y0, y1, 0.4, 0.0, 0.0);
+                    draw_vert(pixel_arr, x, y0, y1, 0.8, 0.0, 0.0);
                 } else {
                     draw_vert(pixel_arr, x, y0, y1, max(AMBIENT + lambertian_coeff, 0.0), max(AMBIENT + lambertian_coeff, 0.0), max(AMBIENT + lambertian_coeff, 0.0));
                 }
-                draw_vert(pixel_arr, x, 0, y0, 0.0, 0.0, 0.0);
+                draw_vert(pixel_arr, x, 0, y0, 0.1, 0.0, 0.0);
             }
 
             destroy_ray(ray);
         }
 
-        // TODO: apply dithering filter
+        for (int y = 0; y < SCR_HEIGHT; y++) {
+            for (int x = 0; x < SCR_WIDTH; x++) {
+                if (fabs(pixel_arr[3 * (y * SCR_WIDTH + x) + 0] - pixel_arr[3 * (y * SCR_WIDTH + x) + 1]) > FUDGE ||
+                    fabs(pixel_arr[3 * (y * SCR_WIDTH + x) + 0] - pixel_arr[3 * (y * SCR_WIDTH + x) + 2]) > FUDGE) {
+                    continue;
+                }
+                float lum_out = pixel_arr[3 * (y * SCR_WIDTH + x) + 0] + bayer_matrix[x % 8][y % 8];
+                float lum = lum_out > 0.56 ? 1.0 : 0.0;
+
+                pixel_arr[3 * (y * SCR_WIDTH + x) + 0] = lum;
+                pixel_arr[3 * (y * SCR_WIDTH + x) + 1] = lum;
+                pixel_arr[3 * (y * SCR_WIDTH + x) + 2] = lum;
+            }
+        }
 
         // draw pixels
         glDrawPixels(SCR_WIDTH, SCR_HEIGHT, GL_RGB, GL_FLOAT, pixel_arr);

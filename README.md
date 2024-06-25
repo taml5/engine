@@ -7,5 +7,5 @@
 - [X] Lighting
 - [ ] Add sector heights
 - [ ] Texture mapping
-- [ ] Dithering filter
+- [X] Dithering filter
 - [ ] Sprites

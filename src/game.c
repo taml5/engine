@@ -28,7 +28,7 @@ bool collision(struct camera *camera, struct wall *wall, struct vec2 *new, doubl
         return false;
     }
     double s = (c1 * walldir_y - walldir_x * c2) / denom;
-    if (s < 0 || s > 1) {
+    if (s < 0 + FUDGE || s > 1) {
         return false;
     }
     double param = (posdir_x * c2 - c1 * posdir_y) / denom;
@@ -41,7 +41,8 @@ bool collision(struct camera *camera, struct wall *wall, struct vec2 *new, doubl
 
 bool update_location(struct camera *camera,
                      struct sector **sectors,
-                     struct vec2 *new) {
+                     struct vec2 *new,
+                     int depth) {
     if (camera->pos->x == new->x && camera->pos->y == new->y) {
         return false;
     }
@@ -50,25 +51,29 @@ bool update_location(struct camera *camera,
     for (int i = 0; i < sectors[camera->sector - 1]->n_walls; i++) {
         struct wall *wall = sectors[camera->sector - 1]->walls[i];
         if (collision(camera, wall, new, &t)) {
-            if (wall->portal != 0 && (t < -1.0 + 0.1 || t > 0.0 - 0.1)) {
+            if (wall->portal != 0 && (t < -1.0 + 0.01|| t > 0.0 - 0.01)) {
                 return false;
             } else if (wall->portal != 0 && fabs(sectors[camera->sector - 1]->floor_z  - sectors[wall->portal - 1]->floor_z) < 1.0) {
                 camera->sector = wall->portal;
                 return true;
+            }
+
+            // calculate the resulting direction component along wall
+            struct vec2 direction = {
+                new->x - camera->pos->x,
+                new->y - camera->pos->y
+            };
+            struct vec2 walldir = {
+                wall->end->x - wall->start->x,
+                wall->end->y - wall->start->y
+            };
+            double len = min(dot(&walldir, &direction) * Q_rsqrt(pow(walldir.x, 2.0) + pow(walldir.y, 2.0)), 0.5);
+            new->x = camera->pos->x + 0.5 * len * walldir.x;
+            new->y = camera->pos->y + 0.5 * len * walldir.y;
+            if (depth < 10) {
+                return update_location(camera, sectors, new, depth + 1);
             } else {
-                // calculate the resulting direction component along wall
-                struct vec2 direction = {
-                    new->x - camera->pos->x,
-                    new->y - camera->pos->y
-                };
-                struct vec2 walldir = {
-                    wall->end->x - wall->start->x,
-                    wall->end->y - wall->start->y
-                };
-                float len = dot(&walldir, &direction) * Q_rsqrt(pow(walldir.x, 2.0) + pow(walldir.y, 2.0));
-                new->x = camera->pos->x + 0.5 * len * walldir.x;
-                new->y = camera->pos->y + 0.5 * len * walldir.y;
-                return update_location(camera, sectors, new);
+                return false;
             }
         }
     }

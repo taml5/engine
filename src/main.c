@@ -75,14 +75,14 @@ int main(int argc, char *argv[]) {
     // initialise camera
     struct camera *camera = malloc(sizeof(struct camera));
     camera->pos = malloc(sizeof(struct vec2));
-    camera->pos->x = 2;
-    camera->pos->y = 2;
+    camera->pos->x = 2.0;
+    camera->pos->y = 2.0;
     camera->angle = PI;
     camera->anglecos = cos(camera->angle);
     camera->anglesin = sin(camera->angle);
     camera->sector = 1;
 
-    struct vec2 new;
+    struct vec2 new = {2.0, 2.0};
     glfwWindowHint(GLFW_SCALE_FRAMEBUFFER, GLFW_FALSE);
 
     // create the engine window
@@ -103,7 +103,7 @@ int main(int argc, char *argv[]) {
     while (!glfwWindowShouldClose(window)) {
         process_input(window, camera, sectors, &new);
 
-        if (update_location(camera, sectors, &new)) {
+        if (update_location(camera, sectors, &new, 0)) {
             camera->pos->x = new.x;
             camera->pos->y = new.y;
         }

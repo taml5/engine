@@ -13,7 +13,7 @@
  * @param camera: The camera.
  * @param wall: The wall to check for an intersection.
  * @param new: The new position of the camera.
- * @param t: The parameter for the wall parametric equation..
+ * @param t: The parameter for the wall parametric equation.
  */
 bool collision(struct camera *camera, struct wall *wall, struct vec2 *new, double *t) {
     double walldir_x = wall->end->x - wall->start->x;

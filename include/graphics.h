@@ -111,8 +111,8 @@ bool intersection(struct ray *ray, struct wall *wall, double min_t, double *dept
  * @param ray: The viewing ray.
  * @param sector: The sector to check for intersections within.
  * @param sectors: The array of sectors in the map.
- * @param min_t:
- * @param is_vertex: 
+ * @param min_t: The minimum distance to consider.
+ * @param is_vertex: Whether the hit part of the wall is on a vertex or not.
  * @param depth: The distance from the camera to the colliding wall.
  * @param hit_id: The id of the intersecting wall.
  * @param hit_sector: The id of the sector containing the intersecting wall.

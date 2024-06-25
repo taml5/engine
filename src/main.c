@@ -110,7 +110,7 @@ int main(int argc, char *argv[]) {
 
         /* Render here */
         glClear(GL_COLOR_BUFFER_BIT);
-        // memset(pixel_arr, 0, sizeof(float) * 3 * SCR_HEIGHT * SCR_WIDTH);  // reset pixel buffer
+        memset(pixel_arr, 0, sizeof(float) * 3 * SCR_HEIGHT * SCR_WIDTH);  // reset pixel buffer
 
         double depth;
         int hit_id, hit_sector;

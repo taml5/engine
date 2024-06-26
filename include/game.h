@@ -79,7 +79,7 @@ struct sector {
 struct camera {
     struct vec2 *pos;
     int sector;
-    float angle, anglecos, anglesin;
+    float angle, anglecos, anglesin, height;
 };
 
 /**

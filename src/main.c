@@ -65,6 +65,8 @@ int main(int argc, char *argv[]) {
     glfwGetVersion(&major, &minor, &revision);
     printf("Running against GLFW %i.%i.%i\n", major, minor, revision);
 
+    float ratio = (float) SCR_HEIGHT / (float) SCR_WIDTH;
+
     // load sectors and build sector and wall structs
     int n_sectors;
     struct sector **sectors = load_sectors("./content/map.txt", &n_sectors);
@@ -82,6 +84,7 @@ int main(int argc, char *argv[]) {
     camera->anglecos = cos(camera->angle);
     camera->anglesin = sin(camera->angle);
     camera->sector = 1;
+    camera->height = CAM_Z;
 
     struct vec2 new = {2.0, 2.0};
     glfwWindowHint(GLFW_SCALE_FRAMEBUFFER, GLFW_FALSE);
@@ -125,9 +128,11 @@ int main(int argc, char *argv[]) {
 
                 // calculate depth effect
                 // TODO: calculate heights of ceiling and floors as well
-                int line_height = (int) SCR_HEIGHT / depth;
-                int y0 = max((SCR_HEIGHT / 2) - (line_height / 2), 0);
-                int y1 = min((SCR_HEIGHT / 2) + (line_height / 2), SCR_HEIGHT - 1);
+                int floor_y = (int) (SCR_HEIGHT / 2) * ((sectors[hit_sector - 1]->ceil_z - camera->height) / depth * ratio);
+                int ceil_y = (int) (SCR_HEIGHT / 2) * ((camera->height - sectors[hit_sector - 1]->floor_z) / depth * ratio);
+
+                int y1 = min((SCR_HEIGHT / 2) + (floor_y), SCR_HEIGHT - 1);
+                int y0 = max((SCR_HEIGHT / 2) - (ceil_y), 0);
 
                 // calculate colour based on angle to x-axis
                 struct vec2 light = {1.5, 1.5};

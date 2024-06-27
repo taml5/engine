@@ -106,23 +106,6 @@ void destroy_ray(struct ray *ray);
 bool intersection(struct ray *ray, struct wall *wall, double min_t, double *depth, bool *is_vertex);
 
 /**
- * Determine if there was an intersection between a given viewing ray and a wall in the sector. If there
- * is an intersection, store the depth and wall id in `depth` and `hit_id` respectively.
- * 
- * @param ray: The viewing ray.
- * @param sector: The sector to check for intersections within.
- * @param sectors: The array of sectors in the map.
- * @param min_t: The minimum distance to consider.
- * @param is_vertex: Whether the hit part of the wall is on a vertex or not.
- * @param depth: The distance from the camera to the colliding wall.
- * @param hit_id: The id of the intersecting wall.
- * @param hit_sector: The id of the sector containing the intersecting wall.
- * 
- * @return Whether there was an intersection or not.
- */
-bool first_hit(struct ray *ray, struct sector *sector, struct sector **sectors, double min_t, bool *is_vertex, double *depth, int *hit_id, int *hit_sector);
-
-/**
  * Calculate the luminosity given by the wall from the light at `light_pt` with intensity `intensity` using
  * the Lambertian model.
  * 

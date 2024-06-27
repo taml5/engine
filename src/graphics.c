@@ -45,10 +45,12 @@ struct vec2 wall_norm(struct wall *wall) {
 void draw_vert(float *pixel_arr, int x, int y0, int y1, float r, float g, float b) {
     for (int i = y0; i < y1; i++) {
         if (!(fabs(r - g) < FUDGE || fabs(r - g) < FUDGE)) {
+            // not greyscale - render in full colour
             pixel_arr[3 * (i * SCR_WIDTH + x) + 0] = r;
             pixel_arr[3 * (i * SCR_WIDTH + x) + 1] = g;
             pixel_arr[3 * (i * SCR_WIDTH + x) + 2] = b;
         } else {
+            // greyscale - apply dithering filter
             float lum_out = r + bayer_matrix[x % BAYER_NUM][i % BAYER_NUM];
             float lum = lum_out > 0.5 ? 1.0 : 0.0;
 
@@ -57,11 +59,6 @@ void draw_vert(float *pixel_arr, int x, int y0, int y1, float r, float g, float 
             pixel_arr[3 * (i * SCR_WIDTH + x) + 2] = lum;
         }
     }
-}
-
-void destroy_ray(struct ray *ray) {
-    free(ray->direction);
-    free(ray);
 }
 
 struct ray *viewing_ray(struct camera *camera, int x) {
@@ -75,6 +72,11 @@ struct ray *viewing_ray(struct camera *camera, int x) {
     ray->direction = ray_dir;
     ray->origin = camera->pos;
     return ray;
+}
+
+void destroy_ray(struct ray *ray) {
+    free(ray->direction);
+    free(ray);
 }
 
 bool intersection(struct ray *ray, struct wall *wall, double min_t, double *depth, bool *is_vertex) {
@@ -105,39 +107,6 @@ bool intersection(struct ray *ray, struct wall *wall, double min_t, double *dept
     *is_vertex = (s < 0 + EDGE_LIM || s > 1 - EDGE_LIM) ? true : false;
     *depth = t;
     return true;
-}
-
-bool first_hit(struct ray *ray, 
-               struct sector *sector, 
-               struct sector **sectors, 
-               double min_t, 
-               bool *is_vertex, 
-               double *depth, 
-               int *hit_id,
-               int *hit_sector) {
-    bool hit = false;
-    *depth = HUGE_VAL;
-    *hit_sector = sector->id;
-    double curr_depth;
-    for (int i = 0; i < sector->n_walls; i++) {
-        if (intersection(ray, sector->walls[i], min_t, &curr_depth, is_vertex) && curr_depth < *depth) {
-            hit = true;
-            *hit_id = i;
-            *depth = curr_depth;
-        }
-    }
-
-    if (hit && sector->walls[*hit_id]->portal != 0) {
-        return first_hit(ray, 
-                         sectors[sector->walls[*hit_id]->portal - 1], 
-                         sectors, 
-                         *depth + FUDGE, 
-                         is_vertex, 
-                         depth, 
-                         hit_id,
-                         hit_sector);
-    }
-    return hit;
 }
 
 float lambertian(struct ray *ray, struct vec2 *light_pt, float depth, struct wall *wall, float intensity) {
@@ -176,11 +145,10 @@ void render(
     if (!hit) {return;}  // no wall was found: don't draw anything
 
     // calculate depth effect
-    // XXX: THE VARIABLE NAMES ARE NOT INDICATIVE OF WHAT THEY ACTUALLY ARE!!!
-    int floor_y = (int) (SCR_HEIGHT / 2) * ((sectors[hit_sector - 1]->ceil_z - camera->height) / (depth * RATIO));
-    int ceil_y = (int) (SCR_HEIGHT / 2) * ((camera->height - sectors[hit_sector - 1]->floor_z) / (depth * RATIO));
-    int y0 = max((SCR_HEIGHT / 2) - (ceil_y), 0);
-    int y1 = min((SCR_HEIGHT / 2) + (floor_y), SCR_HEIGHT - 1);
+    int ceil_y = (int) (SCR_HEIGHT / 2) * ((sectors[hit_sector - 1]->ceil_z - camera->height) / (depth * RATIO));
+    int floor_y = (int) (SCR_HEIGHT / 2) * ((camera->height - sectors[hit_sector - 1]->floor_z) / (depth * RATIO));
+    int y0 = max((SCR_HEIGHT / 2) - (floor_y), 0);
+    int y1 = min((SCR_HEIGHT / 2) + (ceil_y), SCR_HEIGHT - 1);
 
     struct wall *hit_wall = (sectors[hit_sector - 1]->walls)[hit_id];
     // apply shading model to wall
@@ -195,15 +163,15 @@ void render(
         render(pixel_arr, camera, sectors, ray, x, sectors[sector->walls[hit_id]->portal - 1], depth + FUDGE);
         // draw the lintel
         float new_sector_ceil = sectors[sector->walls[hit_id]->portal - 1]->ceil_z;
-        int new_ceil_y = (int) (SCR_HEIGHT / 2) * ((new_sector_ceil - camera->height) / (depth * RATIO));
-        int new_ceil_y0 =  min((SCR_HEIGHT / 2) + (new_ceil_y), SCR_HEIGHT - 1);
-        draw_vert(pixel_arr, x, new_ceil_y0, y1, lambertian_coeff, lambertian_coeff, lambertian_coeff);
+        int lintel_y = (int) (SCR_HEIGHT / 2) * ((new_sector_ceil - camera->height) / (depth * RATIO));
+        int lintel_y0 =  min((SCR_HEIGHT / 2) + (lintel_y), SCR_HEIGHT - 1);
+        draw_vert(pixel_arr, x, lintel_y0, y1, lambertian_coeff, lambertian_coeff, lambertian_coeff);
         
         // // draw the step
         float new_sector_floor = sectors[sector->walls[hit_id]->portal - 1]->floor_z;
-        int floor_y = (int) (SCR_HEIGHT / 2) * ((camera->height - new_sector_floor) / (depth * RATIO));
-        int floor_y0 = max((SCR_HEIGHT / 2) - floor_y, 0);
-        draw_vert(pixel_arr, x, y0, floor_y0, lambertian_coeff, lambertian_coeff, lambertian_coeff);
+        int step_h = (int) (SCR_HEIGHT / 2) * ((camera->height - new_sector_floor) / (depth * RATIO));
+        int step_y = max((SCR_HEIGHT / 2) - step_h, 0);
+        draw_vert(pixel_arr, x, y0, step_y, lambertian_coeff, lambertian_coeff, lambertian_coeff);
     } else if (is_vertex) {
         draw_vert(pixel_arr, x, y0, y1, 1.0, 1.0, 1.0);
     } else {

@@ -103,15 +103,13 @@ int main(int argc, char *argv[]) {
     while (!glfwWindowShouldClose(window)) {
         process_input(window, camera, sectors, &new);
 
+        // update the player's location
         if (update_location(camera, sectors, &new, 0)) {
             camera->pos->x = new.x;
             camera->pos->y = new.y;
         }
 
         /* Render here */
-        double depth;
-        int hit_id, hit_sector;
-        bool is_vertex;
         for (int x = 0; x < SCR_WIDTH; x++) {
             struct ray *ray = viewing_ray(camera, x);
             render(pixel_arr, camera, sectors, ray, x, sectors[camera->sector - 1], FUDGE);

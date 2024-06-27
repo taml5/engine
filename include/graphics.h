@@ -133,3 +133,15 @@ bool first_hit(struct ray *ray, struct sector *sector, struct sector **sectors, 
  * @param intensity: The intensity of light.
  */
 float lambertian(struct ray *ray, struct vec2 *light_pt, float depth, struct wall *wall, float intensity);
+
+/**
+ * Render the screen.
+ */
+void render(float *pixel_arr,
+    struct camera *camera,
+    struct sector **sectors,
+    struct ray *ray,
+    int x,
+    struct sector *sector,
+    double min_t
+);

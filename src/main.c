@@ -119,33 +119,7 @@ int main(int argc, char *argv[]) {
         bool is_vertex;
         for (int x = 0; x < SCR_WIDTH; x++) {
             struct ray *ray = viewing_ray(camera, x);
-
-            int sector_index = camera->sector - 1;
-            if (first_hit(ray, sectors[sector_index], sectors, FUDGE, &is_vertex, &depth, &hit_id, &hit_sector)) {
-                struct wall *hit_wall = (sectors[hit_sector - 1]->walls)[hit_id];
-
-                // calculate depth effect
-                int floor_y = (int) (SCR_HEIGHT / 2) * ((sectors[hit_sector - 1]->ceil_z - camera->height) / (depth * RATIO));
-                int ceil_y = (int) (SCR_HEIGHT / 2) * ((camera->height - sectors[hit_sector - 1]->floor_z) / (depth * RATIO));
-
-                int y0 = max((SCR_HEIGHT / 2) - (ceil_y), 0);
-                int y1 = min((SCR_HEIGHT / 2) + (floor_y), SCR_HEIGHT - 1);
-
-                // calculate colour based on angle to x-axis
-                struct vec2 light = {1.5, 1.5};
-                float lambertian_coeff = 0;
-                lambertian_coeff += lambertian(ray, &light, depth, hit_wall, 0.1);
-                lambertian_coeff += lambertian(ray, camera->pos, depth, hit_wall, min(0.4 / powf(depth, 2.0), 0.3));
-                
-                draw_vert(pixel_arr, x, y1, SCR_HEIGHT, 0.0, 0.0, 0.5);
-                if (is_vertex) {
-                    draw_vert(pixel_arr, x, y0, y1, 0.8, 0.0, 0.0);
-                } else {
-                    draw_vert(pixel_arr, x, y0, y1, max(AMBIENT + lambertian_coeff, 0.0), max(AMBIENT + lambertian_coeff, 0.0), max(AMBIENT + lambertian_coeff, 0.0));
-                }
-                draw_vert(pixel_arr, x, 0, y0, 0.5, 0.0, 0.0);
-            }
-
+            render(pixel_arr, camera, sectors, ray, x, sectors[camera->sector - 1], FUDGE);
             destroy_ray(ray);
         }
 

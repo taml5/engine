@@ -5,7 +5,7 @@
     - [X] Add wall sliding
     - [X] Fix border vertex out of bounds clipping
 - [X] Lighting
-- [ ] Add sector heights
+- [X] Add sector heights
 - [ ] Texture mapping
 - [X] Dithering filter
 - [ ] Sprites

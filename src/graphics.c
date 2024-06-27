@@ -49,7 +49,7 @@ void draw_vert(float *pixel_arr, int x, int y0, int y1, float r, float g, float 
             pixel_arr[3 * (i * SCR_WIDTH + x) + 1] = g;
             pixel_arr[3 * (i * SCR_WIDTH + x) + 2] = b;
         } else {
-            float lum_out = r + bayer_matrix[x % 8][i % 8];
+            float lum_out = r + bayer_matrix[x % BAYER_NUM][i % BAYER_NUM];
             float lum = lum_out > 0.56 ? 1.0 : 0.0;
 
             pixel_arr[3 * (i * SCR_WIDTH + x) + 0] = lum;
@@ -159,6 +159,7 @@ void render(
     struct sector *sector,
     double min_t
 ) {
+    // find the first hit wall
     bool hit = false, is_vertex = false;
     double depth = HUGE_VAL;
     int hit_sector = sector->id, hit_id;
@@ -171,16 +172,18 @@ void render(
             depth = curr_depth;
         }
     }
-    // calculate depth effect
-    // XXX: THE VARIABLE NAMES ARE NOT INDICATIVE OF WHAT THEY ACTUALLY ARE!!!
-    int floor_y = (int) (SCR_HEIGHT / 2) * ((sectors[hit_sector - 1]->ceil_z - camera->height) / (depth * RATIO));
-    int ceil_y = (int) (SCR_HEIGHT / 2) * ((camera->height - sectors[hit_sector - 1]->floor_z) / (depth * RATIO));
-    int y0 = max((SCR_HEIGHT / 2) - (ceil_y), 0);
-    int y1 = min((SCR_HEIGHT / 2) + (floor_y), SCR_HEIGHT - 1);
+    
 
     if (!hit) {
         ;
     } else {
+        // calculate depth effect
+        // XXX: THE VARIABLE NAMES ARE NOT INDICATIVE OF WHAT THEY ACTUALLY ARE!!!
+        int floor_y = (int) (SCR_HEIGHT / 2) * ((sectors[hit_sector - 1]->ceil_z - camera->height) / (depth * RATIO));
+        int ceil_y = (int) (SCR_HEIGHT / 2) * ((camera->height - sectors[hit_sector - 1]->floor_z) / (depth * RATIO));
+        int y0 = max((SCR_HEIGHT / 2) - (ceil_y), 0);
+        int y1 = min((SCR_HEIGHT / 2) + (floor_y), SCR_HEIGHT - 1);
+
         struct wall *hit_wall = (sectors[hit_sector - 1]->walls)[hit_id];
         // calculate colour based on angle to x-axis
         struct vec2 light = {1.5, 1.5};
@@ -214,8 +217,8 @@ void render(
         } else {
             draw_vert(pixel_arr, x, y0, y1, max(AMBIENT + lambertian_coeff, 0.0), max(AMBIENT + lambertian_coeff, 0.0), max(AMBIENT + lambertian_coeff, 0.0));
         }
+        // draw floor and ceiling
+        draw_vert(pixel_arr, x, y1, SCR_HEIGHT, 0.0, 0.0, 0.1);
+        draw_vert(pixel_arr, x, 0, y0, 0.1, 0.0, 0.0);
     }
-    // draw floor and ceiling
-    draw_vert(pixel_arr, x, y1, SCR_HEIGHT, 0.0, 0.0, 0.1);
-    draw_vert(pixel_arr, x, 0, y0, 0.1, 0.0, 0.0);
 }

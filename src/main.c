@@ -70,7 +70,7 @@ int main(int argc, char *argv[]) {
 
     // initialise pixel buffer storing luminance and alpha
     float *pixel_arr = malloc(sizeof(float) * SCR_WIDTH * SCR_HEIGHT * 3);
-    // memset(pixel_arr, 0, sizeof(float) * 3 * SCR_HEIGHT * SCR_WIDTH);
+    memset(pixel_arr, 0, sizeof(float) * 3 * SCR_HEIGHT * SCR_WIDTH);
 
     // initialise camera
     struct camera *camera = malloc(sizeof(struct camera));

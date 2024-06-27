@@ -55,7 +55,7 @@ bool update_location(struct camera *camera,
                 return false;
             } else if (wall->portal != 0 
             && fabs(sectors[camera->sector - 1]->floor_z  - sectors[wall->portal - 1]->floor_z) < 1.0
-            && sectors[wall->portal - 1]->ceil_z - sectors[wall->portal - 1]->floor_z > 1.7) {
+            && sectors[wall->portal - 1]->ceil_z - sectors[wall->portal - 1]->floor_z > CAM_Z + FUDGE) {
                 camera->height += sectors[wall->portal - 1]->floor_z - sectors[camera->sector - 1]->floor_z;
                 camera->sector = wall->portal;
                 return true;

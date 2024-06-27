@@ -44,7 +44,7 @@ struct vec2 wall_norm(struct wall *wall) {
 
 void draw_vert(float *pixel_arr, int x, int y0, int y1, float r, float g, float b) {
     for (int i = y0; i < y1; i++) {
-        if (!(fabs(r - g) < FUDGE || fabs(r - g) < FUDGE)) {
+        if (fabs(r - g) > FUDGE || fabs(r - b) > FUDGE || fabs(g - b) > FUDGE) {
             // not greyscale - render in full colour
             pixel_arr[3 * (i * SCR_WIDTH + x) + 0] = r;
             pixel_arr[3 * (i * SCR_WIDTH + x) + 1] = g;
@@ -161,16 +161,19 @@ void render(
     if (sector->walls[hit_id]->portal != 0) {
         // recursively render the other sector
         render(pixel_arr, camera, sectors, ray, x, sectors[sector->walls[hit_id]->portal - 1], depth + FUDGE);
-        // draw the lintel
+
+        // calculate lintel height and convert to pixel coordinates
         float new_sector_ceil = sectors[sector->walls[hit_id]->portal - 1]->ceil_z;
         int lintel_h = (int) (SCR_HEIGHT / 2) * ((new_sector_ceil - camera->height) / (depth * RATIO));
         int lintel_y =  min((SCR_HEIGHT / 2) + (lintel_h), SCR_HEIGHT - 1);
+        // draw the lintel
         draw_vert(pixel_arr, x, lintel_y, y1, lambertian_coeff, lambertian_coeff, lambertian_coeff);
         
-        // draw the sill
+        // calculate sill height and convert to pixel coordinates
         float new_sector_floor = sectors[sector->walls[hit_id]->portal - 1]->floor_z;
         int sill_h = (int) (SCR_HEIGHT / 2) * ((camera->height - new_sector_floor) / (depth * RATIO));
         int sill_y = max((SCR_HEIGHT / 2) - sill_h, 0);
+        // draw the sill
         draw_vert(pixel_arr, x, y0, sill_y, lambertian_coeff, lambertian_coeff, lambertian_coeff);
     } else if (is_vertex) {
         draw_vert(pixel_arr, x, y0, y1, 1.0, 1.0, 1.0);
@@ -178,6 +181,6 @@ void render(
         draw_vert(pixel_arr, x, y0, y1, lambertian_coeff, lambertian_coeff, lambertian_coeff);
     }
     // draw floor and ceiling
-    draw_vert(pixel_arr, x, y1, SCR_HEIGHT, 0.0, 0.0, 0.1);
-    draw_vert(pixel_arr, x, 0, y0, 0.1, 0.0, 0.0);
+    draw_vert(pixel_arr, x, y1, SCR_HEIGHT, 0.0, 0.0, 1.0 - 0.25 * sectors[hit_sector - 1]->ceil_z);
+    draw_vert(pixel_arr, x, 0, y0, 0.1 + 0.25 * sectors[hit_sector - 1]->floor_z, 0.0, 0.0);
 }

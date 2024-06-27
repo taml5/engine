@@ -65,8 +65,6 @@ int main(int argc, char *argv[]) {
     glfwGetVersion(&major, &minor, &revision);
     printf("Running against GLFW %i.%i.%i\n", major, minor, revision);
 
-    float ratio = (float) SCR_HEIGHT / (float) SCR_WIDTH;
-
     // load sectors and build sector and wall structs
     int n_sectors;
     struct sector **sectors = load_sectors("./content/map.txt", &n_sectors);
@@ -127,12 +125,11 @@ int main(int argc, char *argv[]) {
                 struct wall *hit_wall = (sectors[hit_sector - 1]->walls)[hit_id];
 
                 // calculate depth effect
-                // TODO: calculate heights of ceiling and floors as well
-                int floor_y = (int) (SCR_HEIGHT / 2) * ((sectors[hit_sector - 1]->ceil_z - camera->height) / depth * ratio);
-                int ceil_y = (int) (SCR_HEIGHT / 2) * ((camera->height - sectors[hit_sector - 1]->floor_z) / depth * ratio);
+                int floor_y = (int) (SCR_HEIGHT / 2) * ((sectors[hit_sector - 1]->ceil_z - camera->height) / (depth * RATIO));
+                int ceil_y = (int) (SCR_HEIGHT / 2) * ((camera->height - sectors[hit_sector - 1]->floor_z) / (depth * RATIO));
 
-                int y1 = min((SCR_HEIGHT / 2) + (floor_y), SCR_HEIGHT - 1);
                 int y0 = max((SCR_HEIGHT / 2) - (ceil_y), 0);
+                int y1 = min((SCR_HEIGHT / 2) + (floor_y), SCR_HEIGHT - 1);
 
                 // calculate colour based on angle to x-axis
                 struct vec2 light = {1.5, 1.5};
@@ -140,13 +137,13 @@ int main(int argc, char *argv[]) {
                 lambertian_coeff += lambertian(ray, &light, depth, hit_wall, 0.1);
                 lambertian_coeff += lambertian(ray, camera->pos, depth, hit_wall, min(0.4 / powf(depth, 2.0), 0.3));
                 
-                draw_vert(pixel_arr, x, y1, SCR_HEIGHT, 0.0, 0.0, 0.1);
+                draw_vert(pixel_arr, x, y1, SCR_HEIGHT, 0.0, 0.0, 0.5);
                 if (is_vertex) {
                     draw_vert(pixel_arr, x, y0, y1, 0.8, 0.0, 0.0);
                 } else {
                     draw_vert(pixel_arr, x, y0, y1, max(AMBIENT + lambertian_coeff, 0.0), max(AMBIENT + lambertian_coeff, 0.0), max(AMBIENT + lambertian_coeff, 0.0));
                 }
-                draw_vert(pixel_arr, x, 0, y0, 0.1, 0.0, 0.0);
+                draw_vert(pixel_arr, x, 0, y0, 0.5, 0.0, 0.0);
             }
 
             destroy_ray(ray);

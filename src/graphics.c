@@ -1,4 +1,5 @@
 #include "graphics.h"
+#include "bayer.h"
 
 float dot(struct vec2 *a, struct vec2 *b) {
     return (a->x * b->x) + (a->y * b->y);
@@ -43,9 +44,18 @@ struct vec2 wall_norm(struct wall *wall) {
 
 void draw_vert(float *pixel_arr, int x, int y0, int y1, float r, float g, float b) {
     for (int i = y0; i < y1; i++) {
-        pixel_arr[3 * (i * SCR_WIDTH + x) + 0] = r;
-        pixel_arr[3 * (i * SCR_WIDTH + x) + 1] = g;
-        pixel_arr[3 * (i * SCR_WIDTH + x) + 2] = b;
+        if (!(fabs(r - g) < FUDGE || fabs(r - g) < FUDGE)) {
+            pixel_arr[3 * (i * SCR_WIDTH + x) + 0] = r;
+            pixel_arr[3 * (i * SCR_WIDTH + x) + 1] = g;
+            pixel_arr[3 * (i * SCR_WIDTH + x) + 2] = b;
+        } else {
+            float lum_out = r + bayer_matrix[x % 8][i % 8];
+            float lum = lum_out > 0.56 ? 1.0 : 0.0;
+
+            pixel_arr[3 * (i * SCR_WIDTH + x) + 0] = lum;
+            pixel_arr[3 * (i * SCR_WIDTH + x) + 1] = lum;
+            pixel_arr[3 * (i * SCR_WIDTH + x) + 2] = lum;
+        }
     }
 }
 

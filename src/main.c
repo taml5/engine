@@ -4,7 +4,6 @@
 #endif
 #include "graphics.h"
 #include "load.h"
-#include "bayer.h"
 
 /**
  * Process the inputs of the user and perform different actions based on them.
@@ -121,21 +120,6 @@ int main(int argc, char *argv[]) {
             struct ray *ray = viewing_ray(camera, x);
             render(pixel_arr, camera, sectors, ray, x, sectors[camera->sector - 1], FUDGE);
             destroy_ray(ray);
-        }
-
-        for (int y = 0; y < SCR_HEIGHT; y++) {
-            for (int x = 0; x < SCR_WIDTH; x++) {
-                if (fabs(pixel_arr[3 * (y * SCR_WIDTH + x) + 0] - pixel_arr[3 * (y * SCR_WIDTH + x) + 1]) > FUDGE ||
-                    fabs(pixel_arr[3 * (y * SCR_WIDTH + x) + 0] - pixel_arr[3 * (y * SCR_WIDTH + x) + 2]) > FUDGE) {
-                    continue;
-                }
-                float lum_out = pixel_arr[3 * (y * SCR_WIDTH + x) + 0] + bayer_matrix[x % 8][y % 8];
-                float lum = lum_out > 0.56 ? 1.0 : 0.0;
-
-                pixel_arr[3 * (y * SCR_WIDTH + x) + 0] = lum;
-                pixel_arr[3 * (y * SCR_WIDTH + x) + 1] = lum;
-                pixel_arr[3 * (y * SCR_WIDTH + x) + 2] = lum;
-            }
         }
 
         // draw pixels

@@ -135,7 +135,15 @@ bool first_hit(struct ray *ray, struct sector *sector, struct sector **sectors, 
 float lambertian(struct ray *ray, struct vec2 *light_pt, float depth, struct wall *wall, float intensity);
 
 /**
- * Render the screen.
+ * Render the world scene on the given x coordinate.
+ * 
+ * @param pixel_arr: The pixel buffer.
+ * @param camera: The camera.
+ * @param sectors: The array of sectors.
+ * @param ray: The light ray from the camera through the x coordinate on the image plane.
+ * @param x: The x coordinate of the image plane.
+ * @param sector: The current sector of the camera.
+ * @param min_t: The minimum distance of objects to be rendered.
  */
 void render(float *pixel_arr,
     struct camera *camera,

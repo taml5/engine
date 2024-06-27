@@ -172,53 +172,44 @@ void render(
             depth = curr_depth;
         }
     }
-    
 
-    if (!hit) {
-        ;
+    if (!hit) {return;}  // no wall was found: don't draw anything
+
+    // calculate depth effect
+    // XXX: THE VARIABLE NAMES ARE NOT INDICATIVE OF WHAT THEY ACTUALLY ARE!!!
+    int floor_y = (int) (SCR_HEIGHT / 2) * ((sectors[hit_sector - 1]->ceil_z - camera->height) / (depth * RATIO));
+    int ceil_y = (int) (SCR_HEIGHT / 2) * ((camera->height - sectors[hit_sector - 1]->floor_z) / (depth * RATIO));
+    int y0 = max((SCR_HEIGHT / 2) - (ceil_y), 0);
+    int y1 = min((SCR_HEIGHT / 2) + (floor_y), SCR_HEIGHT - 1);
+
+    struct wall *hit_wall = (sectors[hit_sector - 1]->walls)[hit_id];
+    // apply shading model to wall
+    struct vec2 light = {1.5, 1.5};
+    float lambertian_coeff = 0;
+    lambertian_coeff += lambertian(ray, &light, depth, hit_wall, 0.1);
+    lambertian_coeff += lambertian(ray, camera->pos, depth, hit_wall, min(0.4 / powf(depth, 2.0), 0.3));
+    lambertian_coeff = min(max(AMBIENT + lambertian_coeff, 0.0), 1.0);  // clamp intensity coefficient
+
+    if (sector->walls[hit_id]->portal != 0) {
+        // recursively render the other sector
+        render(pixel_arr, camera, sectors, ray, x, sectors[sector->walls[hit_id]->portal - 1], depth + FUDGE);
+        // draw the lintel
+        float new_sector_ceil = sectors[sector->walls[hit_id]->portal - 1]->ceil_z;
+        int new_ceil_y = (int) (SCR_HEIGHT / 2) * ((new_sector_ceil - camera->height) / (depth * RATIO));
+        int new_ceil_y0 =  min((SCR_HEIGHT / 2) + (new_ceil_y), SCR_HEIGHT - 1);
+        draw_vert(pixel_arr, x, new_ceil_y0, y1, lambertian_coeff, lambertian_coeff, lambertian_coeff);
+        
+        // // draw the step
+        float new_sector_floor = sectors[sector->walls[hit_id]->portal - 1]->floor_z;
+        int floor_y = (int) (SCR_HEIGHT / 2) * ((camera->height - new_sector_floor) / (depth * RATIO));
+        int floor_y0 = max((SCR_HEIGHT / 2) - floor_y, 0);
+        draw_vert(pixel_arr, x, y0, floor_y0, lambertian_coeff, lambertian_coeff, lambertian_coeff);
+    } else if (is_vertex) {
+        draw_vert(pixel_arr, x, y0, y1, 1.0, 1.0, 1.0);
     } else {
-        // calculate depth effect
-        // XXX: THE VARIABLE NAMES ARE NOT INDICATIVE OF WHAT THEY ACTUALLY ARE!!!
-        int floor_y = (int) (SCR_HEIGHT / 2) * ((sectors[hit_sector - 1]->ceil_z - camera->height) / (depth * RATIO));
-        int ceil_y = (int) (SCR_HEIGHT / 2) * ((camera->height - sectors[hit_sector - 1]->floor_z) / (depth * RATIO));
-        int y0 = max((SCR_HEIGHT / 2) - (ceil_y), 0);
-        int y1 = min((SCR_HEIGHT / 2) + (floor_y), SCR_HEIGHT - 1);
-
-        struct wall *hit_wall = (sectors[hit_sector - 1]->walls)[hit_id];
-        // calculate colour based on angle to x-axis
-        struct vec2 light = {1.5, 1.5};
-        float lambertian_coeff = 0;
-        lambertian_coeff += lambertian(ray, &light, depth, hit_wall, 0.1);
-        lambertian_coeff += lambertian(ray, camera->pos, depth, hit_wall, min(0.4 / powf(depth, 2.0), 0.3));
-
-        if (sector->walls[hit_id]->portal != 0) {
-            render(
-                pixel_arr,
-                camera,
-                sectors,
-                ray,
-                x,
-                sectors[sector->walls[hit_id]->portal - 1],
-                depth + FUDGE
-            );
-            // draw the lintel
-            float new_sector_ceil = sectors[sector->walls[hit_id]->portal - 1]->ceil_z;
-            int new_ceil_y = (int) (SCR_HEIGHT / 2) * ((new_sector_ceil - camera->height) / (depth * RATIO));
-            int new_ceil_y0 =  min((SCR_HEIGHT / 2) + (new_ceil_y), SCR_HEIGHT - 1);
-            draw_vert(pixel_arr, x, new_ceil_y0, y1, max(AMBIENT + lambertian_coeff, 0.0), max(AMBIENT + lambertian_coeff, 0.0), max(AMBIENT + lambertian_coeff, 0.0));
-            
-            // // draw the step
-            float new_sector_floor = sectors[sector->walls[hit_id]->portal - 1]->floor_z;
-            int floor_y = (int) (SCR_HEIGHT / 2) * ((camera->height - new_sector_floor) / (depth * RATIO));
-            int floor_y0 = max((SCR_HEIGHT / 2) - floor_y, 0);
-            draw_vert(pixel_arr, x, y0, floor_y0, max(AMBIENT + lambertian_coeff, 0.0), max(AMBIENT + lambertian_coeff, 0.0), max(AMBIENT + lambertian_coeff, 0.0));
-        } else if (is_vertex) {
-            draw_vert(pixel_arr, x, y0, y1, 1.0, 1.0, 1.0);
-        } else {
-            draw_vert(pixel_arr, x, y0, y1, max(AMBIENT + lambertian_coeff, 0.0), max(AMBIENT + lambertian_coeff, 0.0), max(AMBIENT + lambertian_coeff, 0.0));
-        }
-        // draw floor and ceiling
-        draw_vert(pixel_arr, x, y1, SCR_HEIGHT, 0.0, 0.0, 0.1);
-        draw_vert(pixel_arr, x, 0, y0, 0.1, 0.0, 0.0);
+        draw_vert(pixel_arr, x, y0, y1, lambertian_coeff, lambertian_coeff, lambertian_coeff);
     }
+    // draw floor and ceiling
+    draw_vert(pixel_arr, x, y1, SCR_HEIGHT, 0.0, 0.0, 0.1);
+    draw_vert(pixel_arr, x, 0, y0, 0.1, 0.0, 0.0);
 }

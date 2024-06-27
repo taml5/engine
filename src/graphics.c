@@ -163,15 +163,15 @@ void render(
         render(pixel_arr, camera, sectors, ray, x, sectors[sector->walls[hit_id]->portal - 1], depth + FUDGE);
         // draw the lintel
         float new_sector_ceil = sectors[sector->walls[hit_id]->portal - 1]->ceil_z;
-        int lintel_y = (int) (SCR_HEIGHT / 2) * ((new_sector_ceil - camera->height) / (depth * RATIO));
-        int lintel_y0 =  min((SCR_HEIGHT / 2) + (lintel_y), SCR_HEIGHT - 1);
-        draw_vert(pixel_arr, x, lintel_y0, y1, lambertian_coeff, lambertian_coeff, lambertian_coeff);
+        int lintel_h = (int) (SCR_HEIGHT / 2) * ((new_sector_ceil - camera->height) / (depth * RATIO));
+        int lintel_y =  min((SCR_HEIGHT / 2) + (lintel_h), SCR_HEIGHT - 1);
+        draw_vert(pixel_arr, x, lintel_y, y1, lambertian_coeff, lambertian_coeff, lambertian_coeff);
         
-        // // draw the step
+        // draw the sill
         float new_sector_floor = sectors[sector->walls[hit_id]->portal - 1]->floor_z;
-        int step_h = (int) (SCR_HEIGHT / 2) * ((camera->height - new_sector_floor) / (depth * RATIO));
-        int step_y = max((SCR_HEIGHT / 2) - step_h, 0);
-        draw_vert(pixel_arr, x, y0, step_y, lambertian_coeff, lambertian_coeff, lambertian_coeff);
+        int sill_h = (int) (SCR_HEIGHT / 2) * ((camera->height - new_sector_floor) / (depth * RATIO));
+        int sill_y = max((SCR_HEIGHT / 2) - sill_h, 0);
+        draw_vert(pixel_arr, x, y0, sill_y, lambertian_coeff, lambertian_coeff, lambertian_coeff);
     } else if (is_vertex) {
         draw_vert(pixel_arr, x, y0, y1, 1.0, 1.0, 1.0);
     } else {

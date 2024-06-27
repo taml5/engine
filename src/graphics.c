@@ -50,7 +50,7 @@ void draw_vert(float *pixel_arr, int x, int y0, int y1, float r, float g, float 
             pixel_arr[3 * (i * SCR_WIDTH + x) + 2] = b;
         } else {
             float lum_out = r + bayer_matrix[x % BAYER_NUM][i % BAYER_NUM];
-            float lum = lum_out > 0.56 ? 1.0 : 0.0;
+            float lum = lum_out > 0.5 ? 1.0 : 0.0;
 
             pixel_arr[3 * (i * SCR_WIDTH + x) + 0] = lum;
             pixel_arr[3 * (i * SCR_WIDTH + x) + 1] = lum;

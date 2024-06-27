@@ -3,11 +3,11 @@ CFLAGS = -std=gnu99 -O3 -lglfw3 -framework CoreVideo -framework OpenGL -framewor
 engine: build/main.o build/graphics.o build/load.o build/game.o
 	gcc ${CFLAGS} build/main.o build/graphics.o build/load.o build/game.o -o engine
 
-build/main.o: src/main.c include/graphics.h include/game.h include/bayer.h
-	@mkdir -p ./build/
+build/main.o: src/main.c include/graphics.h include/game.h
+	mkdir -p build
 	gcc -I./include/ -c -o $@ $<
 
-build/graphics.o: src/graphics.c include/graphics.h
+build/graphics.o: src/graphics.c include/graphics.h include/bayer.h
 	gcc -I./include/ -c -o $@ $<
 
 build/load.o: src/load.c include/load.h
@@ -23,5 +23,5 @@ debug: build/main.o build/graphics.o build/load.o build/game.o
 	gcc -D DEBUG ${CFLAGS} build/main.o build/graphics.o build/load.o build/game.o -o engine
 
 clean:
-	rm -r ./build/
+	rm -r ./build
 	rm ./engine

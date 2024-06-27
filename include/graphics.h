@@ -13,7 +13,7 @@
 #define SCR_HEIGHT 480  // screen height
 #define RATIO ((float) SCR_HEIGHT / (float) SCR_WIDTH)
 
-#define EDGE_LIM 0.004  // limit for edge detection
+#define EDGE_LIM 0.005  // limit for edge detection
 #define WORLD2CAM(x) (-1 + (2 * (x + 0.5)) / SCR_WIDTH)   // transformation from world plane to image plane
 
 #define AMBIENT 0.05  // the ambient light intensity value

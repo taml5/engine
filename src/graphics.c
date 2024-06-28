@@ -133,7 +133,7 @@ void render(
     int sector_dist
 ) {
     // find the first hit wall
-    struct sector *sector = sectors[sector_id - 1];
+    struct sector *sector = sectors[sector_id];
     bool hit = false, is_vertex = false;
     double depth = HUGE_VAL;
     int hit_sector = sector->id, hit_id;
@@ -150,12 +150,12 @@ void render(
     if (!hit) {return;}  // no wall was found: don't draw anything
 
     // calculate depth effect
-    int ceil_y = (int) (SCR_HEIGHT / 2) * ((sectors[hit_sector - 1]->ceil_z - camera->height) / (depth * RATIO));
-    int floor_y = (int) (SCR_HEIGHT / 2) * ((camera->height - sectors[hit_sector - 1]->floor_z) / (depth * RATIO));
+    int ceil_y = (int) (SCR_HEIGHT / 2) * ((sectors[hit_sector]->ceil_z - camera->height) / (depth * RATIO));
+    int floor_y = (int) (SCR_HEIGHT / 2) * ((camera->height - sectors[hit_sector]->floor_z) / (depth * RATIO));
     int y0 = max((SCR_HEIGHT / 2) - (floor_y), 0);
     int y1 = min((SCR_HEIGHT / 2) + (ceil_y), SCR_HEIGHT - 1);
 
-    struct wall *hit_wall = (sectors[hit_sector - 1]->walls)[hit_id];
+    struct wall *hit_wall = (sectors[hit_sector]->walls)[hit_id];
     // apply shading model to wall
     float lambertian_coeff = lambertian(ray, camera->pos, depth, hit_wall, min(0.4 / powf(depth, 2.0), 0.3));
     float intensity = min(max(AMBIENT + lambertian_coeff, 0.0), 1.0);  // clamp intensity coefficient
@@ -166,14 +166,14 @@ void render(
         render(pixel_arr, camera, sectors, ray, x, sector->walls[hit_id]->portal, depth + FUDGE, sector_dist + 1);
 
         // calculate lintel height and convert to pixel coordinates
-        float new_sector_ceil = sectors[sector->walls[hit_id]->portal - 1]->ceil_z;
+        float new_sector_ceil = sectors[sector->walls[hit_id]->portal]->ceil_z;
         int lintel_h = (int) (SCR_HEIGHT / 2) * ((new_sector_ceil - camera->height) / (depth * RATIO));
         int lintel_y =  min((SCR_HEIGHT / 2) + (lintel_h), SCR_HEIGHT - 1);
         // draw the lintel
         draw_vert(pixel_arr, x, lintel_y, y1, &colour);
         
         // calculate sill height and convert to pixel coordinates
-        float new_sector_floor = sectors[sector->walls[hit_id]->portal - 1]->floor_z;
+        float new_sector_floor = sectors[sector->walls[hit_id]->portal]->floor_z;
         int sill_h = (int) (SCR_HEIGHT / 2) * ((camera->height - new_sector_floor) / (depth * RATIO));
         int sill_y = max((SCR_HEIGHT / 2) - sill_h, 0);
         // draw the sill

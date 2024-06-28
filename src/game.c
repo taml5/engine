@@ -48,15 +48,15 @@ bool update_location(struct camera *camera,
     }
 
     double t;
-    for (int i = 0; i < sectors[camera->sector - 1]->n_walls; i++) {
-        struct wall *wall = sectors[camera->sector - 1]->walls[i];
+    for (int i = 0; i < sectors[camera->sector]->n_walls; i++) {
+        struct wall *wall = sectors[camera->sector]->walls[i];
         if (collision(camera, wall, new, &t)) {
             if (wall->portal != 0 && (t <= 0 + 0.005 || t >= 1 - 0.005)) {
                 return false;
             } else if (wall->portal != 0 
-            && fabs(sectors[camera->sector - 1]->floor_z  - sectors[wall->portal - 1]->floor_z) < 1.0
-            && sectors[wall->portal - 1]->ceil_z - sectors[wall->portal - 1]->floor_z > CAM_Z + FUDGE) {
-                camera->height += sectors[wall->portal - 1]->floor_z - sectors[camera->sector - 1]->floor_z;
+            && fabs(sectors[camera->sector]->floor_z  - sectors[wall->portal]->floor_z) < 1.0
+            && sectors[wall->portal]->ceil_z - sectors[wall->portal]->floor_z > CAM_Z + FUDGE) {
+                camera->height += sectors[wall->portal]->floor_z - sectors[camera->sector]->floor_z;
                 camera->sector = wall->portal;
                 return true;
             }

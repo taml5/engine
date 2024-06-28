@@ -7,11 +7,12 @@ struct sector **load_sectors(char *filepath, int *n_sectors) {
         return NULL;
     }
     fscanf(file, "%d", n_sectors);
-    struct sector **sectors = malloc(*n_sectors * sizeof(struct sector));
+    struct sector **sectors = malloc((*n_sectors + 1) * sizeof(struct sector));
+    sectors[0] = NULL;
 
     int id, n_walls;
     float floor_z, ceil_z;
-    for (int i = 0; i < *n_sectors; i++) {
+    for (int i = 1; i < *n_sectors + 1; i++) {
         fscanf(file, "%d %d %f %f", &id, &n_walls, &floor_z, &ceil_z);
         printf("loading sector %d with %d walls\n", id, n_walls);
         struct sector *sector = malloc(sizeof(struct sector));
@@ -58,7 +59,7 @@ struct sector **load_sectors(char *filepath, int *n_sectors) {
 }
 
 void destroy_sectors(struct sector **sectors, int *n_sectors) {
-    for (int i = 0; i < *n_sectors; i++) {
+    for (int i = 1; i < *n_sectors + 1; i++) {
         for (int j = 0; j < sectors[i]->n_walls; j++) {
             struct wall *wall = sectors[i]->walls[j];
             free(wall->start);

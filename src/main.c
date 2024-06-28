@@ -80,7 +80,7 @@ int main(int argc, char *argv[]) {
     camera->anglecos = cos(camera->angle);
     camera->anglesin = sin(camera->angle);
     camera->sector = 1;
-    camera->height = CAM_Z + sectors[camera->sector -1]->floor_z;
+    camera->height = CAM_Z + sectors[camera->sector]->floor_z;
 
     struct vec2 new = {camera->pos->x, camera->pos->y};
     glfwWindowHint(GLFW_SCALE_FRAMEBUFFER, GLFW_FALSE);

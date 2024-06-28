@@ -8,4 +8,3 @@
 - [X] Add sector heights
 - [ ] Texture mapping
 - [X] Dithering filter
-- [ ] Sprites

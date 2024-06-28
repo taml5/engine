@@ -80,9 +80,9 @@ int main(int argc, char *argv[]) {
     camera->anglecos = cos(camera->angle);
     camera->anglesin = sin(camera->angle);
     camera->sector = 1;
-    camera->height = CAM_Z;
+    camera->height = CAM_Z + sectors[camera->sector -1]->floor_z;
 
-    struct vec2 new = {2.0, 2.0};
+    struct vec2 new = {camera->pos->x, camera->pos->y};
     glfwWindowHint(GLFW_SCALE_FRAMEBUFFER, GLFW_FALSE);
 
     // create the engine window
@@ -112,7 +112,7 @@ int main(int argc, char *argv[]) {
         /* Render here */
         for (int x = 0; x < SCR_WIDTH; x++) {
             struct ray *ray = viewing_ray(camera, x);
-            render(pixel_arr, camera, sectors, ray, x, sectors[camera->sector - 1], FUDGE);
+            render(pixel_arr, camera, sectors, ray, x, camera->sector, FUDGE);
             destroy_ray(ray);
         }
 

@@ -16,6 +16,8 @@ struct sector **load_sectors(char *filepath, int *n_sectors) {
         printf("loading sector %d with %d walls\n", id, n_walls);
         struct sector *sector = malloc(sizeof(struct sector));
         struct wall **walls = malloc(sizeof(struct wall*) * n_walls);
+        sector->floor_colour = malloc(sizeof(struct rgb));
+        sector->ceil_colour = malloc(sizeof(struct rgb));
         
         int start_x, start_y, end_x, end_y, portal;
         for (int j = 0; j < n_walls; j++) {
@@ -41,6 +43,13 @@ struct sector **load_sectors(char *filepath, int *n_sectors) {
         sector->walls = walls;
         sector->floor_z = floor_z;
         sector->ceil_z = ceil_z;
+        
+        sector->floor_colour->r = 0.1 + 0.25 * floor_z;
+        sector->floor_colour->g = 0.0;
+        sector->floor_colour->b = 0.0;
+        sector->ceil_colour->r = 0.0;
+        sector->ceil_colour->g = 0.0;
+        sector->ceil_colour->b = 1.0 - 0.25 * ceil_z;
 
         sectors[i] = sector;
     }
@@ -57,6 +66,8 @@ void destroy_sectors(struct sector **sectors, int *n_sectors) {
             free(wall);
         }
         free(sectors[i]->walls);
+        free(sectors[i]->floor_colour);
+        free(sectors[i]->ceil_colour);
         free(sectors[i]);
     }
     free(sectors);

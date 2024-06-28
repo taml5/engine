@@ -37,6 +37,20 @@ struct vec2i {
 };
 
 /**
+ * A struct representing an RGB colour value.
+ * 
+ * @param r The red value of the colour, between 0.0 and 1.0.
+ * @param g The green value of the colour, between 0.0 and 1.0.
+ * @param b The blue value of the colour, between 0.0 and 1.0.
+ */
+struct rgb {
+    float r;
+    float g;
+    float b;
+};
+
+
+/**
  * A wall of the map.
  * 
  * @param start: The starting endpoint of the wall.
@@ -57,6 +71,8 @@ struct wall {
  * @param walls: A pointer to an array of wall pointers that make up this sector.
  * @param floor_z: The height of the floor.
  * @param ceil_z: The height of the ceiling.
+ * @param floor_colour: The colour of the sector floor.
+ * @param ceil_colour: The colour of the sector ceiling.
  */
 struct sector {
     int id;
@@ -64,6 +80,8 @@ struct sector {
     struct wall **walls;
     float floor_z;
     float ceil_z;
+    struct rgb *floor_colour;
+    struct rgb *ceil_colour;
 };
 
 /**

@@ -42,16 +42,18 @@ struct vec2 wall_norm(struct wall *wall) {
     return normalise(&walln);
 }
 
-void draw_vert(float *pixel_arr, int x, int y0, int y1, float r, float g, float b) {
+void draw_vert(float *pixel_arr, int x, int y0, int y1, struct rgb *colour) {
     for (int i = y0; i < y1; i++) {
-        if (fabs(r - g) > FUDGE || fabs(r - b) > FUDGE || fabs(g - b) > FUDGE) {
+        if (fabs(colour->r - colour->g) > FUDGE 
+        || fabs(colour->r - colour->b) > FUDGE 
+        || fabs(colour->g - colour->b) > FUDGE) {
             // not greyscale - render in full colour
-            pixel_arr[3 * (i * SCR_WIDTH + x) + 0] = r;
-            pixel_arr[3 * (i * SCR_WIDTH + x) + 1] = g;
-            pixel_arr[3 * (i * SCR_WIDTH + x) + 2] = b;
+            pixel_arr[3 * (i * SCR_WIDTH + x) + 0] = colour->r;
+            pixel_arr[3 * (i * SCR_WIDTH + x) + 1] = colour->g;
+            pixel_arr[3 * (i * SCR_WIDTH + x) + 2] = colour->b;
         } else {
             // greyscale - apply dithering filter
-            float lum_out = r + bayer_matrix[x % BAYER_NUM][i % BAYER_NUM];
+            float lum_out = colour->r + bayer_matrix[x % BAYER_NUM][i % BAYER_NUM];
             float lum = lum_out > 0.5 ? 1.0 : 0.0;
 
             pixel_arr[3 * (i * SCR_WIDTH + x) + 0] = lum;
@@ -79,7 +81,7 @@ void destroy_ray(struct ray *ray) {
     free(ray);
 }
 
-bool intersection(struct ray *ray, struct wall *wall, double min_t, double *depth, bool *is_vertex) {
+bool intersection(struct ray *ray, struct wall *wall, double min_t, double *depth, double *length, bool *is_vertex) {
     // implementation of cramer's rule on the system of linear equations
     // given by equating the parametric equations of both lines
     double walldir_x = wall->end->x - wall->start->x;
@@ -95,7 +97,7 @@ bool intersection(struct ray *ray, struct wall *wall, double min_t, double *dept
     }
     double s = ((p_min_l_x * ray->direction->y) - (p_min_l_y * ray->direction->x)) / denom;
     if (s < 0 || s > 1) {
-        // intersection lies outside of the point
+        // intersection lies outside of the wall
         return false;
     }
     double t = ((walldir_x * p_min_l_y) - (walldir_y * p_min_l_x)) / denom;
@@ -106,6 +108,7 @@ bool intersection(struct ray *ray, struct wall *wall, double min_t, double *dept
     
     *is_vertex = (s < 0 + EDGE_LIM || s > 1 - EDGE_LIM) ? true : false;
     *depth = t;
+    *length = s;
     return true;
 }
 
@@ -125,17 +128,18 @@ void render(
     struct sector **sectors,
     struct ray *ray,
     int x,
-    struct sector *sector,
+    int sector_id,
     double min_t
 ) {
     // find the first hit wall
+    struct sector *sector = sectors[sector_id - 1];
     bool hit = false, is_vertex = false;
     double depth = HUGE_VAL;
     int hit_sector = sector->id, hit_id;
-    double curr_depth;
+    double curr_depth, curr_len;
 
     for (int i = 0; i < sector->n_walls; i++) {
-        if (intersection(ray, sector->walls[i], min_t, &curr_depth, &is_vertex) && curr_depth < depth) {
+        if (intersection(ray, sector->walls[i], min_t, &curr_depth, &curr_len, &is_vertex) && curr_depth < depth) {
             hit = true;
             hit_id = i;
             depth = curr_depth;
@@ -157,30 +161,32 @@ void render(
     lambertian_coeff += lambertian(ray, &light, depth, hit_wall, 0.1);
     lambertian_coeff += lambertian(ray, camera->pos, depth, hit_wall, min(0.4 / powf(depth, 2.0), 0.3));
     lambertian_coeff = min(max(AMBIENT + lambertian_coeff, 0.0), 1.0);  // clamp intensity coefficient
+    struct rgb colour = {lambertian_coeff, lambertian_coeff, lambertian_coeff};
 
     if (sector->walls[hit_id]->portal != 0) {
         // recursively render the other sector
-        render(pixel_arr, camera, sectors, ray, x, sectors[sector->walls[hit_id]->portal - 1], depth + FUDGE);
+        render(pixel_arr, camera, sectors, ray, x, sector->walls[hit_id]->portal, depth + FUDGE);
 
         // calculate lintel height and convert to pixel coordinates
         float new_sector_ceil = sectors[sector->walls[hit_id]->portal - 1]->ceil_z;
         int lintel_h = (int) (SCR_HEIGHT / 2) * ((new_sector_ceil - camera->height) / (depth * RATIO));
         int lintel_y =  min((SCR_HEIGHT / 2) + (lintel_h), SCR_HEIGHT - 1);
         // draw the lintel
-        draw_vert(pixel_arr, x, lintel_y, y1, lambertian_coeff, lambertian_coeff, lambertian_coeff);
+        draw_vert(pixel_arr, x, lintel_y, y1, &colour);
         
         // calculate sill height and convert to pixel coordinates
         float new_sector_floor = sectors[sector->walls[hit_id]->portal - 1]->floor_z;
         int sill_h = (int) (SCR_HEIGHT / 2) * ((camera->height - new_sector_floor) / (depth * RATIO));
         int sill_y = max((SCR_HEIGHT / 2) - sill_h, 0);
         // draw the sill
-        draw_vert(pixel_arr, x, y0, sill_y, lambertian_coeff, lambertian_coeff, lambertian_coeff);
+        draw_vert(pixel_arr, x, y0, sill_y, &colour);
     } else if (is_vertex) {
-        draw_vert(pixel_arr, x, y0, y1, 1.0, 1.0, 1.0);
+        struct rgb vertex_colour = {1.0, 1.0, 1.0};
+        draw_vert(pixel_arr, x, y0, y1, &vertex_colour);
     } else {
-        draw_vert(pixel_arr, x, y0, y1, lambertian_coeff, lambertian_coeff, lambertian_coeff);
+        draw_vert(pixel_arr, x, y0, y1, &colour);
     }
     // draw floor and ceiling
-    draw_vert(pixel_arr, x, y1, SCR_HEIGHT, 0.0, 0.0, 1.0 - 0.25 * sectors[hit_sector - 1]->ceil_z);
-    draw_vert(pixel_arr, x, 0, y0, 0.1 + 0.25 * sectors[hit_sector - 1]->floor_z, 0.0, 0.0);
+    draw_vert(pixel_arr, x, y1, SCR_HEIGHT, sector->ceil_colour);
+    draw_vert(pixel_arr, x, 0, y0, sector->floor_colour);
 }

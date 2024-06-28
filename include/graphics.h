@@ -50,17 +50,15 @@ struct vec2 normalise(struct vec2 *v);
 struct vec2 wall_norm(struct wall *wall);
 
 /**
- * Draw a vertical line from (x, y0) to (x, y1) in the pixel buffer, with luminance `lum`
- * and alpha `alpha`.
+ * Draw a vertical line from (x, y0) to (x, y1) in the pixel buffer.
  * 
  * @param pixel_arr: The pixel buffer.
  * @param x: The x coordinate of the line.
  * @param y0: The starting endpoint of the line.
  * @param y1: The ending endpoint of the line.
- * @param lum: The luminance of the line.
- * @param alpha: The alpha of the line.
+ * @param colour: The colour of the line.
  */
-void draw_vert(float *pixel_arr, int x, int y0, int y1, float r, float g, float b);
+void draw_vert(float *pixel_arr, int x, int y0, int y1, struct rgb *colour);
 
 /**
  * A struct representing a ray described parametrically.
@@ -100,10 +98,11 @@ void destroy_ray(struct ray *ray);
  * @param min_t: The minimum depth considered.
  * @param depth: The "depth" of the intersection, that is, the distance between the camera and the 
  *               wall, given in the basis of the focal length.
- * @param is_vertex:
+ * @param length: How far along the wall with respect to the start endpoint the intersection occurs at.
+ * @param is_vertex: Whether the hit point is on the endpoints or not.
  * @return Whether there was an intersection or not.
  */
-bool intersection(struct ray *ray, struct wall *wall, double min_t, double *depth, bool *is_vertex);
+bool intersection(struct ray *ray, struct wall *wall, double min_t, double *depth, double *length, bool *is_vertex);
 
 /**
  * Calculate the luminosity given by the wall from the light at `light_pt` with intensity `intensity` using
@@ -125,7 +124,7 @@ float lambertian(struct ray *ray, struct vec2 *light_pt, float depth, struct wal
  * @param sectors: The array of sectors.
  * @param ray: The light ray from the camera through the x coordinate on the image plane.
  * @param x: The x coordinate of the image plane.
- * @param sector: The current sector of the camera.
+ * @param sector_id: The id of the sector to be rendered.
  * @param min_t: The minimum distance of objects to be rendered.
  */
 void render(float *pixel_arr,
@@ -133,6 +132,6 @@ void render(float *pixel_arr,
     struct sector **sectors,
     struct ray *ray,
     int x,
-    struct sector *sector,
+    int sector_id,
     double min_t
 );

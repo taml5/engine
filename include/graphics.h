@@ -16,7 +16,18 @@
 #define EDGE_LIM 0.005  // limit for edge detection
 #define WORLD2CAM(x) (-1 + (2 * (x + 0.5)) / SCR_WIDTH)   // transformation from world plane to image plane
 
-#define AMBIENT 0.05  // the ambient light intensity value
+#define AMBIENT 0.0  // the ambient light intensity value
+
+/**
+ * A struct representing a light in the world.
+ * 
+ * @param pos: The position of the light in world coordinates.
+ * @param intensity: The intensity of the light, between 0.0 and 1.0.
+ */
+struct light {
+    struct vec2 pos;
+    float intensity;
+};
 
 /**
  * Return the dot product between the vectors a and b.

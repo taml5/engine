@@ -129,7 +129,8 @@ void render(
     struct ray *ray,
     int x,
     int sector_id,
-    double min_t
+    double min_t,
+    int sector_dist
 ) {
     // find the first hit wall
     struct sector *sector = sectors[sector_id - 1];
@@ -162,7 +163,7 @@ void render(
 
     if (sector->walls[hit_id]->portal != 0) {
         // recursively render the other sector
-        render(pixel_arr, camera, sectors, ray, x, sector->walls[hit_id]->portal, depth + FUDGE);
+        render(pixel_arr, camera, sectors, ray, x, sector->walls[hit_id]->portal, depth + FUDGE, sector_dist + 1);
 
         // calculate lintel height and convert to pixel coordinates
         float new_sector_ceil = sectors[sector->walls[hit_id]->portal - 1]->ceil_z;
@@ -184,6 +185,16 @@ void render(
         draw_vert(pixel_arr, x, y0, y1, &colour);
     }
     // draw floor and ceiling
-    draw_vert(pixel_arr, x, y1, SCR_HEIGHT, sector->ceil_colour);
-    draw_vert(pixel_arr, x, 0, y0, sector->floor_colour);
+    struct rgb shaded_floor_colour = {
+        sector->floor_colour->r - 0.1 * sector_dist,
+        sector->floor_colour->g - 0.1 * sector_dist,
+        sector->floor_colour->b - 0.1 * sector_dist
+    };
+    struct rgb shaded_ceil_colour = {
+        sector->ceil_colour->r - 0.1 * sector_dist,
+        sector->ceil_colour->g - 0.1 * sector_dist,
+        sector->ceil_colour->b - 0.1 * sector_dist
+    };
+    draw_vert(pixel_arr, x, 0, y0, &shaded_floor_colour);
+    draw_vert(pixel_arr, x, y1, SCR_HEIGHT, &shaded_ceil_colour);
 }

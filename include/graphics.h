@@ -144,5 +144,6 @@ void render(float *pixel_arr,
     struct ray *ray,
     int x,
     int sector_id,
-    double min_t
+    double min_t,
+    int sector_dist
 );

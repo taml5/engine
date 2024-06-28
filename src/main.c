@@ -112,7 +112,7 @@ int main(int argc, char *argv[]) {
         /* Render here */
         for (int x = 0; x < SCR_WIDTH; x++) {
             struct ray *ray = viewing_ray(camera, x);
-            render(pixel_arr, camera, sectors, ray, x, camera->sector, FUDGE);
+            render(pixel_arr, camera, sectors, ray, x, camera->sector, FUDGE, 0);
             destroy_ray(ray);
         }
 

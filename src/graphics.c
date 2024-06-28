@@ -156,12 +156,9 @@ void render(
 
     struct wall *hit_wall = (sectors[hit_sector - 1]->walls)[hit_id];
     // apply shading model to wall
-    struct vec2 light = {1.5, 1.5};
-    float lambertian_coeff = 0;
-    lambertian_coeff += lambertian(ray, &light, depth, hit_wall, 0.1);
-    lambertian_coeff += lambertian(ray, camera->pos, depth, hit_wall, min(0.4 / powf(depth, 2.0), 0.3));
-    lambertian_coeff = min(max(AMBIENT + lambertian_coeff, 0.0), 1.0);  // clamp intensity coefficient
-    struct rgb colour = {lambertian_coeff, lambertian_coeff, lambertian_coeff};
+    float lambertian_coeff = lambertian(ray, camera->pos, depth, hit_wall, min(0.4 / powf(depth, 2.0), 0.3));
+    float intensity = min(max(AMBIENT + lambertian_coeff, 0.0), 1.0);  // clamp intensity coefficient
+    struct rgb colour = {intensity, intensity, intensity};
 
     if (sector->walls[hit_id]->portal != 0) {
         // recursively render the other sector

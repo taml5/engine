@@ -44,12 +44,12 @@ struct sector **load_sectors(char *filepath, int *n_sectors) {
         sector->floor_z = floor_z;
         sector->ceil_z = ceil_z;
         
-        sector->floor_colour->r = 0.1 + 0.25 * floor_z;
+        sector->floor_colour->r = 0.1 + 0.15 * floor_z;
         sector->floor_colour->g = 0.0;
         sector->floor_colour->b = 0.0;
         sector->ceil_colour->r = 0.0;
         sector->ceil_colour->g = 0.0;
-        sector->ceil_colour->b = 1.0 - 0.25 * ceil_z;
+        sector->ceil_colour->b = 0.6 - 0.15 * ceil_z;
 
         sectors[i] = sector;
     }

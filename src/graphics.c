@@ -186,14 +186,14 @@ void render(
     }
     // draw floor and ceiling
     struct rgb shaded_floor_colour = {
-        sector->floor_colour->r - 0.1 * sector_dist,
-        sector->floor_colour->g - 0.1 * sector_dist,
-        sector->floor_colour->b - 0.1 * sector_dist
+        sector->floor_colour->r - (sector->floor_colour->r * SHADING_FAC * sector_dist),
+        sector->floor_colour->g - (sector->floor_colour->g * SHADING_FAC * sector_dist),
+        sector->floor_colour->b - (sector->floor_colour->b * SHADING_FAC * sector_dist)
     };
     struct rgb shaded_ceil_colour = {
-        sector->ceil_colour->r - 0.1 * sector_dist,
-        sector->ceil_colour->g - 0.1 * sector_dist,
-        sector->ceil_colour->b - 0.1 * sector_dist
+        sector->ceil_colour->r - (sector->ceil_colour->r * SHADING_FAC * sector_dist),
+        sector->ceil_colour->g - (sector->ceil_colour->g * SHADING_FAC * sector_dist),
+        sector->ceil_colour->b - (sector->ceil_colour->b * SHADING_FAC * sector_dist)
     };
     draw_vert(pixel_arr, x, 0, y0, &shaded_floor_colour);
     draw_vert(pixel_arr, x, y1, SCR_HEIGHT, &shaded_ceil_colour);

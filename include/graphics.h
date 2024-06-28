@@ -17,6 +17,7 @@
 #define WORLD2CAM(x) (-1 + (2 * (x + 0.5)) / SCR_WIDTH)   // transformation from world plane to image plane
 
 #define AMBIENT 0.0  // the ambient light intensity value
+#define SHADING_FAC 0.2  // determines floor/ceiling intensity per sector distance
 
 /**
  * A struct representing a light in the world.

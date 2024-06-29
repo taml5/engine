@@ -17,8 +17,8 @@
 #define SCR_HEIGHT 480  // screen height
 #define RATIO ((float) SCR_HEIGHT / (float) SCR_WIDTH)
 
-#define TEX_WIDTH 128  // texture width
-#define TEX_HEIGHT 128  // texture height
+#define TEX_WIDTH (128)  // texture width
+#define TEX_HEIGHT (128)  // texture height
 
 /**
  * A struct representing a 2D float vector.
@@ -55,7 +55,7 @@ struct rgb {
     float b;
 };
 
-typedef struct rgb *texture[TEX_HEIGHT * TEX_WIDTH];
+typedef struct rgb *texture;
 
 /**
  * A wall of the map.
@@ -64,10 +64,12 @@ typedef struct rgb *texture[TEX_HEIGHT * TEX_WIDTH];
  * @param end: The ending endpoint of the wall.
  * @param portal: The sector that this portal leads to. If this is not
  *                a portal, its value will be -1.
+ * @param texture_id: The id of the wall texture.
  */
 struct wall {
     struct vec2i *start, *end;
     int portal;
+    int texture_id;
 };
 
 /**

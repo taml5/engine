@@ -20,7 +20,7 @@ struct sector **load_sectors(const char *filepath, int *n_sectors);
  * @param n_textures: The number of textures loaded.
  * @return A pointer to a heap allocated texture array.
  */
-texture *load_textures(const char *filepath, int *n_textures);
+texture *load_textures(const char *filepath, const int n_textures);
 
 /**
  * Deallocate the sector array.

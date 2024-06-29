@@ -68,6 +68,10 @@ int main(int argc, char *argv[]) {
     int n_sectors;
     struct sector **sectors = load_sectors("./content/map.txt", &n_sectors);
 
+    // load textures
+    int n_textures = 0;
+    texture *textures = load_textures("./", n_textures);  // TODO: add correct filepath
+
     // initialise pixel buffer storing luminance and alpha
     float *pixel_arr = malloc(sizeof(float) * SCR_WIDTH * SCR_HEIGHT * 3);
 
@@ -128,8 +132,9 @@ int main(int argc, char *argv[]) {
         fps++;
     }
 
-    destroy_sectors(sectors, n_sectors);
     glfwTerminate();
+    destroy_sectors(sectors, n_sectors);
+    destroy_textures(textures, n_textures);
     free(camera->pos);
     free(camera);
     free(pixel_arr);

@@ -141,7 +141,7 @@ float lambertian(const struct ray *ray, const struct vec2 *light_pt, const float
  */
 void render(float *pixel_arr,
     const struct camera *camera,
-    struct sector **sectors,
+    struct sector * const * const sectors,
     const struct ray *ray,
     const int x,
     const int sector_id,

@@ -138,7 +138,7 @@ float lambertian(
 void render(
     float *pixel_arr,
     const struct camera *camera,
-    struct sector **sectors,
+    struct sector * const * const sectors,
     const struct ray *ray,
     const int x,
     const int sector_id,
@@ -146,7 +146,7 @@ void render(
     const int sector_dist
 ) {
     // find the first hit wall
-    struct sector *sector = sectors[sector_id];
+    const struct sector *sector = sectors[sector_id];
     bool hit = false, is_vertex = false;
     double depth = HUGE_VAL;
     int hit_sector = sector->id, hit_id;

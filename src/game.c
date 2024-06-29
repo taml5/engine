@@ -40,7 +40,7 @@ bool collision(const struct camera *camera, const struct wall *wall, const struc
 }
 
 bool update_location(struct camera *camera,
-                     struct sector **sectors,
+                     struct sector * const * const sectors,
                      struct vec2 *new,
                      const int depth) {
     if (camera->pos->x == new->x && camera->pos->y == new->y) {

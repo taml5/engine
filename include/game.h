@@ -110,6 +110,6 @@ struct camera {
  * @param depth: The recursive depth of the function.
  */
 bool update_location(struct camera *camera,
-                     struct sector **sectors,
+                     struct sector * const * const sectors,
                      struct vec2 *new,
                      const int depth);

@@ -112,4 +112,4 @@ struct camera {
 bool update_location(struct camera *camera,
                      struct sector **sectors,
                      struct vec2 *new,
-                     int depth);
+                     const int depth);

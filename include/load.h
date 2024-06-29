@@ -11,7 +11,7 @@
  * @return A pointer to a heap allocated sector array.
  * 
  */
-struct sector **load_sectors(char *filepath, int *n_sectors);
+struct sector **load_sectors(const char *filepath, int *n_sectors);
 
 /**
  * Deallocate the sector array.

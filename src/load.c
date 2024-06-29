@@ -1,6 +1,6 @@
 #include "load.h"
 
-struct sector **load_sectors(char *filepath, int *n_sectors) {
+struct sector **load_sectors(const char *filepath, int *n_sectors) {
     FILE *file;
     if ((file = fopen(filepath, "r")) == NULL) {
         perror("load_sectors: ");

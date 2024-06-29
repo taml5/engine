@@ -15,7 +15,7 @@
  * @param new: The new position of the camera.
  * @param t: The parameter for the wall parametric equation.
  */
-bool collision(struct camera *camera, struct wall *wall, struct vec2 *new, double *t) {
+bool collision(const struct camera *camera, const struct wall *wall, const struct vec2 *new, double *t) {
     double walldir_x = wall->end->x - wall->start->x;
     double walldir_y = wall->end->y - wall->start->y;
     double posdir_x = new->x - camera->pos->x;
@@ -42,7 +42,7 @@ bool collision(struct camera *camera, struct wall *wall, struct vec2 *new, doubl
 bool update_location(struct camera *camera,
                      struct sector **sectors,
                      struct vec2 *new,
-                     int depth) {
+                     const int depth) {
     if (camera->pos->x == new->x && camera->pos->y == new->y) {
         return false;
     }

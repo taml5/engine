@@ -1,15 +1,15 @@
 #include "graphics.h"
 #include "bayer.h"
 
-float dot(struct vec2 *a, struct vec2 *b) {
+float dot(const struct vec2 *a, const struct vec2 *b) {
     return (a->x * b->x) + (a->y * b->y);
 }
 
-float doti(struct vec2i *a, struct vec2i *b) {
+float doti(const struct vec2i *a, const struct vec2i *b) {
     return (a->x * b->x) + (a->y * b->y);
 }
 
-float Q_rsqrt(float number) {
+float Q_rsqrt(const float number) {
   int i;
   float x2, y;
   const float threehalfs = 1.5F;
@@ -25,7 +25,7 @@ float Q_rsqrt(float number) {
   return y;
 }
 
-struct vec2 normalise(struct vec2 *v) {
+struct vec2 normalise(const struct vec2 *v) {
     float invsqrt = Q_rsqrt(powf(v->x, 2.0) + powf(v->y, 2.0));
 
     return (struct vec2) { 
@@ -34,7 +34,7 @@ struct vec2 normalise(struct vec2 *v) {
     };
 }
 
-struct vec2 wall_norm(struct wall *wall) {
+struct vec2 wall_norm(const struct wall *wall) {
     float walldir_x = wall->end->x - wall->start->x;
     float walldir_y = wall->end->y - wall->start->y;
 
@@ -63,7 +63,7 @@ void draw_vert(float *pixel_arr, int x, int y0, int y1, struct rgb *colour) {
     }
 }
 
-struct ray *viewing_ray(struct camera *camera, int x) {
+struct ray *viewing_ray(const struct camera *camera, const int x) {
     double u_coord = -1.0 + (2 * (x + 0.5)) / SCR_WIDTH;
     
     struct vec2 *ray_dir = malloc(sizeof(struct vec2));
@@ -81,7 +81,14 @@ void destroy_ray(struct ray *ray) {
     free(ray);
 }
 
-bool intersection(struct ray *ray, struct wall *wall, double min_t, double *depth, double *length, bool *is_vertex) {
+bool intersection(
+    const struct ray *ray, 
+    const struct wall *wall, 
+    const double min_t, 
+    double *depth, 
+    double *length, 
+    bool *is_vertex
+) {
     // implementation of cramer's rule on the system of linear equations
     // given by equating the parametric equations of both lines
     double walldir_x = wall->end->x - wall->start->x;
@@ -112,7 +119,13 @@ bool intersection(struct ray *ray, struct wall *wall, double min_t, double *dept
     return true;
 }
 
-float lambertian(struct ray *ray, struct vec2 *light_pt, float depth, struct wall *wall, float intensity) {
+float lambertian(
+    const struct ray *ray, 
+    const struct vec2 *light_pt, 
+    const float depth, 
+    const struct wall *wall, 
+    const float intensity
+) {
     struct vec2 n = wall_norm(wall);
     struct vec2 q = {
         -((ray->origin->x - depth * ray->direction->x) - light_pt->x), 
@@ -124,13 +137,13 @@ float lambertian(struct ray *ray, struct vec2 *light_pt, float depth, struct wal
 
 void render(
     float *pixel_arr,
-    struct camera *camera,
+    const struct camera *camera,
     struct sector **sectors,
-    struct ray *ray,
-    int x,
-    int sector_id,
-    double min_t,
-    int sector_dist
+    const struct ray *ray,
+    const int x,
+    const int sector_id,
+    const double min_t,
+    const int sector_dist
 ) {
     // find the first hit wall
     struct sector *sector = sectors[sector_id];

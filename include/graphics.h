@@ -33,12 +33,12 @@ struct light {
 /**
  * Return the dot product between the vectors a and b.
  */
-float dot(struct vec2 *a, struct vec2 *b);
+float dot(const struct vec2 *a, const struct vec2 *b);
 
 /**
  * Return the dot product between the integer vectors a and b.
  */
-float doti(struct vec2i *a, struct vec2i *b);
+float doti(const struct vec2i *a, const struct vec2i *b);
 
 /**
  * https://en.wikipedia.org/wiki/Fast_inverse_square_root
@@ -49,17 +49,17 @@ float doti(struct vec2i *a, struct vec2i *b);
  * @param number: A number.
  * @return The inverse square root of the number.
  */
-float Q_rsqrt(float number);
+float Q_rsqrt(const float number);
 
 /**
  * Return a normalised version of the given vector v.
  */
-struct vec2 normalise(struct vec2 *v);
+struct vec2 normalise(const struct vec2 *v);
 
 /**
  * Return the clockwise normal to the wall.
  */
-struct vec2 wall_norm(struct wall *wall);
+struct vec2 wall_norm(const struct wall *wall);
 
 /**
  * Draw a vertical line from (x, y0) to (x, y1) in the pixel buffer.
@@ -91,7 +91,7 @@ struct ray {
  *          going through the y-slice. In the parametric representation, when t=1, the resulting
  *          vector lies on the image plane.
  */
-struct ray *viewing_ray(struct camera *camera, int x);
+struct ray *viewing_ray(const struct camera *camera, const int x);
 
 /**
  * Deallocate the memory used by a ray.
@@ -114,7 +114,7 @@ void destroy_ray(struct ray *ray);
  * @param is_vertex: Whether the hit point is on the endpoints or not.
  * @return Whether there was an intersection or not.
  */
-bool intersection(struct ray *ray, struct wall *wall, double min_t, double *depth, double *length, bool *is_vertex);
+bool intersection(const struct ray *ray, const struct wall *wall, const double min_t, double *depth, double *length, bool *is_vertex);
 
 /**
  * Calculate the luminosity given by the wall from the light at `light_pt` with intensity `intensity` using
@@ -126,7 +126,7 @@ bool intersection(struct ray *ray, struct wall *wall, double min_t, double *dept
  * @param wall: The wall.
  * @param intensity: The intensity of light.
  */
-float lambertian(struct ray *ray, struct vec2 *light_pt, float depth, struct wall *wall, float intensity);
+float lambertian(const struct ray *ray, const struct vec2 *light_pt, const float depth, const struct wall *wall, const float intensity);
 
 /**
  * Render the world scene on the given x coordinate.
@@ -140,11 +140,11 @@ float lambertian(struct ray *ray, struct vec2 *light_pt, float depth, struct wal
  * @param min_t: The minimum distance of objects to be rendered.
  */
 void render(float *pixel_arr,
-    struct camera *camera,
+    const struct camera *camera,
     struct sector **sectors,
-    struct ray *ray,
-    int x,
-    int sector_id,
-    double min_t,
-    int sector_dist
+    const struct ray *ray,
+    const int x,
+    const int sector_id,
+    const double min_t,
+    const int sector_dist
 );

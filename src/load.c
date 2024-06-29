@@ -11,9 +11,10 @@ struct sector **load_sectors(const char *filepath, int *n_sectors) {
     sectors[0] = NULL;
 
     int id, n_walls;
-    float floor_z, ceil_z;
+    float floor_z, ceil_z, floor_r, floor_g, floor_b, ceil_r, ceil_g, ceil_b;
     for (int i = 1; i < *n_sectors + 1; i++) {
         fscanf(file, "%d %d %f %f", &id, &n_walls, &floor_z, &ceil_z);
+        fscanf(file, "%f %f %f %f %f %f", &floor_r, &floor_g, &floor_b, &ceil_r, &ceil_g, &ceil_b);
         printf("loading sector %d with %d walls\n", id, n_walls);
         struct sector *sector = malloc(sizeof(struct sector));
         struct wall **walls = malloc(sizeof(struct wall*) * n_walls);
@@ -45,12 +46,12 @@ struct sector **load_sectors(const char *filepath, int *n_sectors) {
         sector->floor_z = floor_z;
         sector->ceil_z = ceil_z;
         
-        sector->floor_colour->r = 0.1 + 0.15 * floor_z;
-        sector->floor_colour->g = 0.0;
-        sector->floor_colour->b = 0.0;
-        sector->ceil_colour->r = 0.0;
-        sector->ceil_colour->g = 0.0;
-        sector->ceil_colour->b = 0.6 - 0.15 * ceil_z;
+        sector->floor_colour->r = floor_r;
+        sector->floor_colour->g = floor_g;
+        sector->floor_colour->b = floor_b;
+        sector->ceil_colour->r = ceil_r;
+        sector->ceil_colour->g = ceil_g;
+        sector->ceil_colour->b = ceil_b;
 
         sectors[i] = sector;
     }

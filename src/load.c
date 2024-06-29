@@ -59,8 +59,8 @@ struct sector **load_sectors(const char *filepath, int *n_sectors) {
     return sectors;
 }
 
-void destroy_sectors(struct sector **sectors, int *n_sectors) {
-    for (int i = 1; i < *n_sectors + 1; i++) {
+void destroy_sectors(struct sector **sectors, const int n_sectors) {
+    for (int i = 1; i < n_sectors + 1; i++) {
         for (int j = 0; j < sectors[i]->n_walls; j++) {
             struct wall *wall = sectors[i]->walls[j];
             free(wall->start);

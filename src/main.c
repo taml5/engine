@@ -128,7 +128,7 @@ int main(int argc, char *argv[]) {
         fps++;
     }
 
-    destroy_sectors(sectors, &n_sectors);
+    destroy_sectors(sectors, n_sectors);
     glfwTerminate();
     free(camera->pos);
     free(camera);

@@ -8,14 +8,9 @@
 #define max(a, b) (a < b ? b : a)
 
 #define FOCAL_LEN 1  // the distance from the camera to the image plane, in game units
-
-#define SCR_WIDTH 640  // screen width
-#define SCR_HEIGHT 480  // screen height
-#define RATIO ((float) SCR_HEIGHT / (float) SCR_WIDTH)
-
-#define EDGE_LIM 0.005  // limit for edge detection
 #define WORLD2CAM(x) (-1 + (2 * (x + 0.5)) / SCR_WIDTH)   // transformation from world plane to image plane
 
+#define EDGE_LIM 0.005  // limit for edge detection
 #define AMBIENT 0.0  // the ambient light intensity value
 #define SHADING_FAC 0.2  // determines floor/ceiling intensity per sector distance
 

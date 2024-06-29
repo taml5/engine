@@ -13,6 +13,12 @@
 #define MVTSPD 1.5f * 0.016f  // movement speed
 
 #define CAM_Z 1.70
+#define SCR_WIDTH 640  // screen width
+#define SCR_HEIGHT 480  // screen height
+#define RATIO ((float) SCR_HEIGHT / (float) SCR_WIDTH)
+
+#define TEX_WIDTH 128  // texture width
+#define TEX_HEIGHT 128  // texture height
 
 /**
  * A struct representing a 2D float vector.
@@ -49,6 +55,7 @@ struct rgb {
     float b;
 };
 
+typedef struct rgb *texture[TEX_HEIGHT * TEX_WIDTH];
 
 /**
  * A wall of the map.

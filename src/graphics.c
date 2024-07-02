@@ -1,6 +1,5 @@
 #include "graphics.h"
 #include "bayer.h"
-#define BAYER
 
 float dot(const struct vec2 *a, const struct vec2 *b) {
     return (a->x * b->x) + (a->y * b->y);

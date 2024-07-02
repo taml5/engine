@@ -9,13 +9,13 @@
 
 #define FUDGE (1e-6)  // fudge factor to avoid floating point errors
 
-#define ROTSPD (2.0f * 0.016f)  // camera rotating speed
-#define MVTSPD (1.5f * 0.016f)  // movement speed
-
-#define CAM_Z (1.70)
 #define SCR_WIDTH (640)  // screen width
 #define SCR_HEIGHT (480)  // screen height
-#define RATIO ((float) SCR_HEIGHT / (float) SCR_WIDTH)
+#define RATIO ((float) SCR_HEIGHT / (float) SCR_WIDTH)  // the aspect ratio
+
+#define ROTSPD (2.0f * 0.016f)  // camera rotating speed
+#define MVTSPD (1.5f * 0.016f)  // movement speed
+#define CAM_Z (1.70)  // the default height of the camera
 
 #define TEX_WIDTH (32)  // texture width
 #define TEX_HEIGHT (32)  // texture height

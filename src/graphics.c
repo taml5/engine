@@ -177,6 +177,7 @@ void draw_wall(
     float wall_len = wall_length(wall);
     tex_x = (int) (TEX_WIDTH * s * wall_len) % TEX_WIDTH;
 
+    // XXX: this code is magic - figure out why
     double height_factor = ((sector->ceil_z - sector->floor_z) / ((SCR_HEIGHT / 2) + (ceil_y) - ((SCR_HEIGHT / 2) - (floor_y))));
 
     for (int y = y0; y < y1; y++) {

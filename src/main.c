@@ -69,7 +69,7 @@ int main(int argc, char *argv[]) {
     struct sector **sectors = load_sectors("./content/map.txt", &n_sectors);
 
     // load textures
-    int n_textures = 0;
+    int n_textures = 1;
     texture *textures = load_textures("./", n_textures);  // TODO: add correct filepath
 
     // initialise pixel buffer storing luminance and alpha
@@ -116,7 +116,7 @@ int main(int argc, char *argv[]) {
         /* Render here */
         for (int x = 0; x < SCR_WIDTH; x++) {
             struct ray *ray = viewing_ray(camera, x);
-            render(pixel_arr, camera, sectors, ray, x, camera->sector, FUDGE, 0);
+            render(pixel_arr, camera, sectors, textures, ray, x, camera->sector, FUDGE, 0);
             destroy_ray(ray);
         }
 

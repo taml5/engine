@@ -66,16 +66,20 @@ texture *load_textures(const char *filepath, const int n_textures) {
         perror("load_sectors: ");
         return NULL;
     }
+    // TODO: complete this function
     texture *textures = malloc(n_textures * sizeof(texture));
     for (int i = 0; i < n_textures; i++) {
         texture texture = malloc(TEX_HEIGHT * TEX_WIDTH * sizeof(struct rgb));
-        for (int j = 0; j < TEX_HEIGHT * TEX_WIDTH; j++) {
-            struct rgb texel = {
-                0.0,
-                0.0,
-                0.0
-            };
-            texture[j] = texel;
+        for (int y = 0; y < TEX_HEIGHT; y++) {
+            for (int x = 0; x < TEX_WIDTH; x++) {
+                struct rgb texel;
+                if (x % 2 == y % 2) {
+                    texel = (struct rgb) {0.0, 0.0, 0.0};
+                } else {
+                    texel = (struct rgb) {1.0, 0.0, 1.0};
+                }
+                texture[y * TEX_WIDTH + x] = texel;
+            }
         }
         textures[i] = texture;
     }
@@ -100,7 +104,7 @@ void destroy_sectors(struct sector **sectors, const int n_sectors) {
     return;
 }
 
-void destroy_textures(texture (*textures), const int n_textures) {
+void destroy_textures(texture *textures, const int n_textures) {
     for (int i = 0; i < n_textures; i++) {
         free(textures[i]);
     }

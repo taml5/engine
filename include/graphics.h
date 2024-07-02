@@ -7,6 +7,11 @@
 #define min(a, b) (a < b ? a : b)
 #define max(a, b) (a < b ? b : a)
 
+// constants for the alpha max plus beta min algorithm
+// https://en.wikipedia.org/wiki/Alpha_max_plus_beta_min_algorithm
+#define ALPHA 0.960433870103
+#define BETA 0.397824734759
+
 #define FOCAL_LEN 1  // the distance from the camera to the image plane, in game units
 #define WORLD2CAM(x) (-1 + (2 * (x + 0.5)) / SCR_WIDTH)   // transformation from world plane to image plane
 
@@ -137,6 +142,7 @@ float lambertian(const struct ray *ray, const struct vec2 *light_pt, const float
 void render(float *pixel_arr,
     const struct camera *camera,
     struct sector * const * const sectors,
+    texture *textures,
     const struct ray *ray,
     const int x,
     const int sector_id,

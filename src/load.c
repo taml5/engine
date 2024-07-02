@@ -86,6 +86,11 @@ texture *load_textures(const char *filepath, const int n_textures) {
                     texel->g = 0.0;
                     texel->b = 1.0;
                 }
+                // } else {
+                //     texel->r = (float) x / TEX_WIDTH;
+                //     texel->g = 0.0;
+                //     texel->b = (float) y / TEX_HEIGHT;
+                // }
                 texture[y * TEX_WIDTH + x] = texel;
             }
         }
@@ -114,6 +119,9 @@ void destroy_sectors(struct sector **sectors, const int n_sectors) {
 
 void destroy_textures(texture *textures, const int n_textures) {
     for (int i = 0; i < n_textures; i++) {
+        for (int j = 0; j < TEX_HEIGHT * TEX_WIDTH; j++){
+            free(textures[i][j]);
+        }        
         free(textures[i]);
     }
     free(textures);

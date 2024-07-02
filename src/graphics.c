@@ -167,21 +167,21 @@ void draw_wall(
     for (int y = y0; y < y1; y++) {
         world_height = (y - ((SCR_HEIGHT / 2) - (floor_y))) * ((sector->ceil_z - sector->floor_z) / ((SCR_HEIGHT / 2) + (ceil_y) - ((SCR_HEIGHT / 2) - (floor_y))));
         
-        tex_y = (int) (TEX_HEIGHT * world_height) % TEX_HEIGHT;
+        tex_y = (int) fabs(TEX_HEIGHT * world_height) % TEX_HEIGHT;
         struct rgb *diffuse_col = textures[wall->texture_id][tex_y * TEX_WIDTH + tex_x];
         
         // float bayer_threshold = bayer_matrix[x % BAYER_NUM][y % BAYER_NUM];
 
-        // float greyscale = 0.2126 * diffuse_col.r + 0.7152 * diffuse_col.g + 0.0722 * diffuse_col.b;
+        // float greyscale = 0.2126 * diffuse_col->r + 0.7152 * diffuse_col->g + 0.0722 * diffuse_col->b;
         // float lum = (greyscale * intensity) + bayer_threshold > 0.5 ? 1.0 : 0.0;
 
         // pixel_arr[3 * (y * SCR_WIDTH + x) + 0] = lum;
         // pixel_arr[3 * (y * SCR_WIDTH + x) + 1] = lum;
         // pixel_arr[3 * (y * SCR_WIDTH + x) + 2] = lum;
 
-        pixel_arr[3 * (y * SCR_WIDTH + x) + 0] = diffuse_col->r;
-        pixel_arr[3 * (y * SCR_WIDTH + x) + 1] = diffuse_col->g;
-        pixel_arr[3 * (y * SCR_WIDTH + x) + 2] = diffuse_col->b;
+        pixel_arr[3 * (y * SCR_WIDTH + x) + 0] = intensity * diffuse_col->r;
+        pixel_arr[3 * (y * SCR_WIDTH + x) + 1] = intensity * diffuse_col->g;
+        pixel_arr[3 * (y * SCR_WIDTH + x) + 2] = intensity * diffuse_col->b;
     }
 }
 
@@ -221,9 +221,10 @@ void render(
 
     struct wall *hit_wall = (sectors[hit_sector]->walls)[hit_id];
     // apply shading model to wall
-    float lambertian_coeff = lambertian(ray, camera->pos, depth, hit_wall, min(0.4 / powf(depth, 2.0), 0.3));
+    float lambertian_coeff = lambertian(ray, camera->pos, depth, hit_wall, min(0.4 / powf(depth, 2.0), 1.0));
+    struct vec2 light = {1.5, 1.5};
+    lambertian_coeff += lambertian(ray, &light, depth, hit_wall, 0.5);
     float intensity = min(max(AMBIENT + lambertian_coeff, 0.0), 1.0);  // clamp intensity coefficient
-    struct rgb colour = {intensity, intensity, intensity};
 
     if (sector->walls[hit_id]->portal != 0) {
         // recursively render the other sector

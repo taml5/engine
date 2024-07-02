@@ -69,14 +69,22 @@ texture *load_textures(const char *filepath, const int n_textures) {
     // TODO: complete this function
     texture *textures = malloc(n_textures * sizeof(texture));
     for (int i = 0; i < n_textures; i++) {
-        texture texture = malloc(TEX_HEIGHT * TEX_WIDTH * sizeof(struct rgb));
+        texture texture = malloc(TEX_HEIGHT * TEX_WIDTH * sizeof(struct rgb *));
         for (int y = 0; y < TEX_HEIGHT; y++) {
             for (int x = 0; x < TEX_WIDTH; x++) {
-                struct rgb texel;
-                if (x % 2 == y % 2) {
-                    texel = (struct rgb) {0.0, 0.0, 0.0};
+                struct rgb *texel = malloc(sizeof(struct rgb));
+                if (x == 0 || y == 0 || x == TEX_WIDTH - 1 || y == TEX_HEIGHT - 1) {
+                    texel->r = 0.0;
+                    texel->g = 0.0;
+                    texel->b = 0.0;
+                } else if (x % 2 == y % 2) {
+                    texel->r = 0.0;
+                    texel->g = 0.0;
+                    texel->b = 0.0;
                 } else {
-                    texel = (struct rgb) {1.0, 0.0, 1.0};
+                    texel->r = 1.0;
+                    texel->g = 0.0;
+                    texel->b = 1.0;
                 }
                 texture[y * TEX_WIDTH + x] = texel;
             }

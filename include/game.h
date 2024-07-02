@@ -55,7 +55,7 @@ struct rgb {
     float b;
 };
 
-typedef struct rgb *texture;
+typedef struct rgb **texture;
 
 /**
  * A wall of the map.

@@ -1,5 +1,6 @@
 #include "graphics.h"
 #include "bayer.h"
+#define BAYER
 
 float dot(const struct vec2 *a, const struct vec2 *b) {
     return (a->x * b->x) + (a->y * b->y);
@@ -159,29 +160,36 @@ void draw_wall(
 ) {
     int tex_x, tex_y;
     double world_height;
+    int bayer_x = x % BAYER_NUM;
 
     // calculate x value of texture
     float wall_len = wall_length(wall);
     tex_x = (int) (TEX_WIDTH * s * wall_len) % TEX_WIDTH;
 
+    double height_factor = ((sector->ceil_z - sector->floor_z) / ((SCR_HEIGHT / 2) + (ceil_y) - ((SCR_HEIGHT / 2) - (floor_y))));
+
     for (int y = y0; y < y1; y++) {
-        world_height = (y - ((SCR_HEIGHT / 2) - (floor_y))) * ((sector->ceil_z - sector->floor_z) / ((SCR_HEIGHT / 2) + (ceil_y) - ((SCR_HEIGHT / 2) - (floor_y))));
+        world_height = (y - ((SCR_HEIGHT / 2) - (floor_y))) * height_factor;
         
         tex_y = (int) fabs(TEX_HEIGHT * world_height) % TEX_HEIGHT;
         struct rgb *diffuse_col = textures[wall->texture_id][tex_y * TEX_WIDTH + tex_x];
         
-        // float bayer_threshold = bayer_matrix[x % BAYER_NUM][y % BAYER_NUM];
+        float bayer_threshold = bayer_matrix[bayer_x][y % BAYER_NUM];
 
-        // float greyscale = 0.2126 * diffuse_col->r + 0.7152 * diffuse_col->g + 0.0722 * diffuse_col->b;
-        // float lum = (greyscale * intensity) + bayer_threshold > 0.5 ? 1.0 : 0.0;
+        float greyscale = 0.2126 * diffuse_col->r + 0.7152 * diffuse_col->g + 0.0722 * diffuse_col->b;
+        float lum = (greyscale * intensity) + bayer_threshold > 0.5 ? 1.0 : 0.0;
 
-        // pixel_arr[3 * (y * SCR_WIDTH + x) + 0] = lum;
-        // pixel_arr[3 * (y * SCR_WIDTH + x) + 1] = lum;
-        // pixel_arr[3 * (y * SCR_WIDTH + x) + 2] = lum;
+        #ifdef BAYER
+        pixel_arr[3 * (y * SCR_WIDTH + x) + 0] = lum;
+        pixel_arr[3 * (y * SCR_WIDTH + x) + 1] = lum;
+        pixel_arr[3 * (y * SCR_WIDTH + x) + 2] = lum;
+        #endif
 
+        #ifndef BAYER
         pixel_arr[3 * (y * SCR_WIDTH + x) + 0] = intensity * diffuse_col->r;
         pixel_arr[3 * (y * SCR_WIDTH + x) + 1] = intensity * diffuse_col->g;
         pixel_arr[3 * (y * SCR_WIDTH + x) + 2] = intensity * diffuse_col->b;
+        #endif
     }
 }
 

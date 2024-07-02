@@ -7,7 +7,7 @@ build/main.o: src/main.c include/game.h include/graphics.h
 	mkdir -p build
 	gcc -I./include/ -c -o $@ $<
 
-build/graphics.o: src/graphics.c include/game.h include/graphics.h include/bayer.h 
+build/graphics.o: src/graphics.c include/game.h include/graphics.h
 	gcc -I./include/ -c -o $@ $<
 
 build/load.o: src/load.c include/game.h include/load.h 

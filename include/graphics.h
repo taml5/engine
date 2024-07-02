@@ -18,7 +18,9 @@
 #define EDGE_LIM 0.005  // limit for edge detection
 #define AMBIENT 0.0  // the ambient light intensity value
 #define SHADING_FAC 0.2  // determines floor/ceiling intensity per sector distance
-// #define BAYER
+
+#define BAYER  // whether to apply the dithering filter
+#define BAYER_NUM 8
 
 /**
  * A struct representing a light in the world.

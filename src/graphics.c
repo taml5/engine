@@ -188,11 +188,17 @@ void draw_wall(
         #ifdef BAYER
         float bayer_threshold = bayer_matrix[bayer_x][y % BAYER_NUM];
         float greyscale = 0.2126 * diffuse_col->r + 0.7152 * diffuse_col->g + 0.0722 * diffuse_col->b;
-        float lum = (greyscale * intensity) + bayer_threshold > 0.5 ? 1.0 : 0.0;
+        int lum = (greyscale * intensity) + bayer_threshold > 0.5 ? 1 : 0;
 
-        pixel_arr[3 * (y * SCR_WIDTH + x) + 0] = lum;
-        pixel_arr[3 * (y * SCR_WIDTH + x) + 1] = lum;
-        pixel_arr[3 * (y * SCR_WIDTH + x) + 2] = lum;
+        if (lum) {
+            pixel_arr[3 * (y * SCR_WIDTH + x) + 0] = 235.0 / 255.0;
+            pixel_arr[3 * (y * SCR_WIDTH + x) + 1] = 229.0 / 255.0;
+            pixel_arr[3 * (y * SCR_WIDTH + x) + 2] = 206.0 / 255.0;
+        } else {
+            pixel_arr[3 * (y * SCR_WIDTH + x) + 0] = 46.0 / 255.0;
+            pixel_arr[3 * (y * SCR_WIDTH + x) + 1] = 48.0 / 255.0;
+            pixel_arr[3 * (y * SCR_WIDTH + x) + 2] = 55.0 / 255.0;
+        }
         #endif
 
         #ifndef BAYER

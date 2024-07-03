@@ -1,7 +1,7 @@
 #include "graphics.h"
 
 // the bayer matrix used to perform the ordered dithering
-static float bayer_matrix[BAYER_NUM][BAYER_NUM] = {
+static const float bayer_matrix[BAYER_NUM][BAYER_NUM] = {
     {-0.5, 0.0, -0.375, 0.125, -0.46875, 0.03125, -0.34375, 0.15625},
     {0.25, -0.25, 0.375, -0.125, 0.28125, -0.21875, 0.40625, -0.09375},
     {-0.3125, 0.1875, -0.4375, 0.0625, -0.28125, 0.21875, -0.40625, 0.09375},

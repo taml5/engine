@@ -110,6 +110,17 @@ struct camera {
 };
 
 /**
+ * Process the inputs of the user and perform different actions based on them.
+ * 
+ * @param window: A pointer to the GLFW window struct.
+ * @param camera: A pointer to the camera struct.
+ */
+void process_input(GLFWwindow *window, 
+                   struct camera *camera, 
+                   struct sector **sectors,
+                   struct vec2 *new);
+
+/**
  * Update the camera's location and sector if necessary. Returns whether the camera's position
  * has changed.
  * 

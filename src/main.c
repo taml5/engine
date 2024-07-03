@@ -5,54 +5,6 @@
 #include "graphics.h"
 #include "load.h"
 
-/**
- * Process the inputs of the user and perform different actions based on them.
- * 
- * @param window: A pointer to the GLFW window struct.
- * @param camera: A pointer to the camera struct.
- */
-void process_input(GLFWwindow *window, 
-                   struct camera *camera, 
-                   struct sector **sectors,
-                   struct vec2 *new)
-{
-    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
-        glfwSetWindowShouldClose(window, 1);
-    }
-    if (glfwGetKey(window, GLFW_KEY_J) == GLFW_PRESS) {
-        // turn left
-        camera->angle = fmod(camera->angle + ROTSPD, PI * 2);
-        camera->anglecos = cos(camera->angle);
-        camera->anglesin = sin(camera->angle);
-    }
-    if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS) {
-        // turn right
-        camera->angle = fmod(camera->angle - ROTSPD, PI * 2);
-        camera->anglecos = cos(camera->angle);
-        camera->anglesin = sin(camera->angle);
-    }
-    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-        // go back
-        new->x = camera->pos->x + MVTSPD * camera->anglecos;
-        new->y = camera->pos->y + MVTSPD * camera->anglesin;
-    }
-    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-        // go forward
-        new->x = camera->pos->x - MVTSPD * camera->anglecos;
-        new->y = camera->pos->y - MVTSPD * camera->anglesin;
-    }
-    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-        // go left
-        new->x = camera->pos->x - MVTSPD * camera->anglesin;
-        new->y = camera->pos->y + MVTSPD * camera->anglecos;
-    }
-    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-        // go right
-        new->x = camera->pos->x + MVTSPD * camera->anglesin;
-        new->y = camera->pos->y - MVTSPD * camera->anglecos;
-    }
-}
-
 int main(int argc, char *argv[]) {
     int fps = 0;
     if (!glfwInit()) {

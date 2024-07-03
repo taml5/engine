@@ -19,6 +19,8 @@
 
 #define TEX_WIDTH (128)  // texture width
 #define TEX_HEIGHT (128)  // texture height
+#define TEX_WIDTH_DENSITY 1  // how much of the texture width is displayed per metre
+#define TEX_HEIGHT_DENSITY 1  // how much of the texture height is displayed per metre
 
 /**
  * A struct representing a 2D float vector.

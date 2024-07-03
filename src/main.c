@@ -22,7 +22,8 @@ int main(int argc, char *argv[]) {
 
     // load textures
     int n_textures = 1;
-    texture *textures = load_textures("./", n_textures);  // TODO: add correct filepath
+    texture *textures = malloc(n_textures * sizeof(texture));
+    textures[0] = load_texture("./content/textures/wood.ppm");
 
     // initialise pixel buffer storing luminance and alpha
     float *pixel_arr = malloc(sizeof(float) * SCR_WIDTH * SCR_HEIGHT * 3);

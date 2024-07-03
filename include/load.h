@@ -14,13 +14,12 @@
 struct sector **load_sectors(const char *filepath, int *n_sectors);
 
 /**
- * Load the texture array from the given filepath.
+ * Load the texture from the given filepath.
  * 
  * @param filepath: The filepath to read the texture data from.
- * @param n_textures: The number of textures loaded.
  * @return A pointer to a heap allocated texture array.
  */
-texture *load_textures(const char *filepath, const int n_textures);
+texture load_texture(const char *filepath);
 
 /**
  * Deallocate the sector array.

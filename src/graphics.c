@@ -174,7 +174,7 @@ void draw_wall(
 
     // calculate x value of texture
     float wall_len = wall_length(wall);
-    tex_x = (int) (TEX_WIDTH * s * wall_len) % TEX_WIDTH;
+    tex_x = (int) (TEX_WIDTH_DENSITY * TEX_WIDTH * s * wall_len) % TEX_WIDTH;
 
     // calculate transformation from world plane to image plane
     double height_factor = (sector->ceil_z - sector->floor_z) / (ceil_y + floor_y);
@@ -182,7 +182,7 @@ void draw_wall(
     for (int y = y0; y < y1; y++) {
         world_height = abs(y - ((SCR_HEIGHT / 2) - floor_y)) * height_factor;
         
-        tex_y = (int) (TEX_HEIGHT * world_height) % TEX_HEIGHT;
+        tex_y = (int) (TEX_HEIGHT_DENSITY * TEX_HEIGHT * world_height) % TEX_HEIGHT;
         struct rgb *diffuse_col = textures[wall->texture_id][tex_y * TEX_WIDTH + tex_x];
     
         #ifdef BAYER

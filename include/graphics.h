@@ -15,11 +15,11 @@
 #define FOCAL_LEN 1  // the distance from the camera to the image plane, in game units
 #define WORLD2CAM(x) (-1 + (2 * (x + 0.5)) / SCR_WIDTH)  // transformation from world plane to image plane
 
-#define EDGE_LIM 0.005  // limit for edge detection
+#define EDGE_LIM 0.01  // limit for edge detection
 #define AMBIENT 0.0  // the ambient light intensity value
 #define SHADING_FAC 0.25  // determines floor/ceiling intensity per sector distance
 
-#define BAYER  // whether to apply the dithering filter
+// #define BAYER  // whether to apply the dithering filter
 #define BAYER_NUM 8  // the size of the bayer matrix
 
 /**

@@ -60,44 +60,36 @@ struct sector **load_sectors(const char *filepath, int *n_sectors) {
     return sectors;
 }
 
-texture *load_textures(const char *filepath, const int n_textures) {
+texture load_texture(const char *filepath) {
     FILE *file;
-    if ((file = fopen(filepath, "r")) == NULL) {
+    if ((file = fopen(filepath, "rb")) == NULL) {
         perror("load_sectors: ");
         return NULL;
     }
-    // TODO: complete this function
-    texture *textures = malloc(n_textures * sizeof(texture));
-    for (int i = 0; i < n_textures; i++) {
-        texture texture = malloc(TEX_HEIGHT * TEX_WIDTH * sizeof(struct rgb *));
-        for (int y = 0; y < TEX_HEIGHT; y++) {
-            for (int x = 0; x < TEX_WIDTH; x++) {
-                struct rgb *texel = malloc(sizeof(struct rgb));
-                if (x == 0 || y == 0 || x == TEX_WIDTH - 1 || y == TEX_HEIGHT - 1) {
-                    texel->r = 0.0;
-                    texel->g = 0.0;
-                    texel->b = 0.0;
-                } else if (x % 2 == y % 2) {
-                    texel->r = 0.0;
-                    texel->g = 0.0;
-                    texel->b = 0.0;
-                } else {
-                    texel->r = 1.0;
-                    texel->g = 0.0;
-                    texel->b = 1.0;
-                }
-                // } else {
-                //     texel->r = (float) x / TEX_WIDTH;
-                //     texel->g = 0.0;
-                //     texel->b = (float) y / TEX_HEIGHT;
-                // }
-                texture[y * TEX_WIDTH + x] = texel;
-            }
-        }
-        textures[i] = texture;
+
+    int width, height, max_colour;
+    fscanf(file, "P6\n %d %d %d", &width, &height, &max_colour);
+    if (width != TEX_WIDTH || height != TEX_HEIGHT || max_colour != 255) {
+        fprintf(stderr, "Invalid image format.\n");
+        return NULL;
     }
 
-    return textures;
+    fseek(file, 1, SEEK_CUR);
+
+    texture texture = malloc(TEX_HEIGHT * TEX_WIDTH * sizeof(struct rgb *));
+    for (int y = TEX_HEIGHT - 1; y >= 0; y--) {
+        for (int x = 0; x < TEX_WIDTH; x++) {
+            unsigned char colour[3];
+            fread(colour, 1, 3, file);
+            struct rgb *texel = malloc(sizeof(struct rgb));
+            texel->r = colour[0] / 255.0;
+            texel->g = colour[1] / 255.0;
+            texel->b = colour[2] / 255.0;
+            texture[y * TEX_WIDTH + x] = texel;
+        }
+    }
+
+    return texture;
 }
 
 void destroy_sectors(struct sector **sectors, const int n_sectors) {

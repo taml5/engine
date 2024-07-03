@@ -169,29 +169,27 @@ void draw_wall(
     const int x,
     const float intensity
 ) {
-    int tex_x, tex_y;
+    int tex_x, tex_y, bayer_x = x % BAYER_NUM;
     double world_height;
-    int bayer_x = x % BAYER_NUM;
 
     // calculate x value of texture
     float wall_len = wall_length(wall);
     tex_x = (int) (TEX_WIDTH * s * wall_len) % TEX_WIDTH;
 
-    // XXX: this code is magic - figure out why
-    double height_factor = ((sector->ceil_z - sector->floor_z) / ((SCR_HEIGHT / 2) + (ceil_y) - ((SCR_HEIGHT / 2) - (floor_y))));
+    // calculate transformation from world plane to image plane
+    double height_factor = (sector->ceil_z - sector->floor_z) / (ceil_y + floor_y);
 
     for (int y = y0; y < y1; y++) {
-        world_height = (y - ((SCR_HEIGHT / 2) - (floor_y))) * height_factor;
+        world_height = abs(y - ((SCR_HEIGHT / 2) - floor_y)) * height_factor;
         
-        tex_y = (int) fabs(TEX_HEIGHT * world_height) % TEX_HEIGHT;
+        tex_y = (int) (TEX_HEIGHT * world_height) % TEX_HEIGHT;
         struct rgb *diffuse_col = textures[wall->texture_id][tex_y * TEX_WIDTH + tex_x];
-        
+    
+        #ifdef BAYER
         float bayer_threshold = bayer_matrix[bayer_x][y % BAYER_NUM];
-
         float greyscale = 0.2126 * diffuse_col->r + 0.7152 * diffuse_col->g + 0.0722 * diffuse_col->b;
         float lum = (greyscale * intensity) + bayer_threshold > 0.5 ? 1.0 : 0.0;
 
-        #ifdef BAYER
         pixel_arr[3 * (y * SCR_WIDTH + x) + 0] = lum;
         pixel_arr[3 * (y * SCR_WIDTH + x) + 1] = lum;
         pixel_arr[3 * (y * SCR_WIDTH + x) + 2] = lum;

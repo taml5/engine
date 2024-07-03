@@ -17,8 +17,8 @@
 #define MVTSPD (1.5f * 0.016f)  // movement speed
 #define CAM_Z (1.70)  // the default height of the camera
 
-#define TEX_WIDTH (32)  // texture width
-#define TEX_HEIGHT (32)  // texture height
+#define TEX_WIDTH (128)  // texture width
+#define TEX_HEIGHT (128)  // texture height
 
 /**
  * A struct representing a 2D float vector.

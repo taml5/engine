@@ -1,5 +1,17 @@
 #include "graphics.h"
-#include "bayer.h"
+
+// the bayer matrix used to perform the ordered dithering
+static const float bayer_matrix[BAYER_NUM][BAYER_NUM] = {
+    {-0.5, 0.0, -0.375, 0.125, -0.46875, 0.03125, -0.34375, 0.15625},
+    {0.25, -0.25, 0.375, -0.125, 0.28125, -0.21875, 0.40625, -0.09375},
+    {-0.3125, 0.1875, -0.4375, 0.0625, -0.28125, 0.21875, -0.40625, 0.09375},
+    {0.4375, -0.0625, 0.3125, -0.1875, 0.46875, -0.03125, 0.34375, -0.15625},
+    {-0.90625, 0.046875, -0.328125, 0.171875, -0.484375, 0.015625, -0.59375, 0.140625},
+    {0.296875, -0.203125, 0.421875, -0.078125, 0.265625, -0.234375, 0.390625, -0.109375},
+    {-0.265625, 0.234375, -0.390625, 0.109375, -0.296875, 0.25, -0.421875, 0.078125},
+    {0.484375, -0.015625, 0.359375, -0.140625, 0.453125, -0.046875, 0.328125, -0.171875}
+};
+
 
 float dot(const struct vec2 *a, const struct vec2 *b) {
     return (a->x * b->x) + (a->y * b->y);
@@ -135,10 +147,73 @@ float lambertian(
     return intensity * max(dot(&light, &n), 0.0);
 }
 
+float wall_length(const struct wall *wall) {
+    float wall_len_x = abs(wall->end->x - wall->start->x);
+    float wall_len_y = abs(wall->end->y - wall->start->y);
+
+    return ALPHA * max(wall_len_x, wall_len_y) + BETA * min(wall_len_x, wall_len_y);
+}
+
+void draw_wall(
+    float *pixel_arr,
+    const struct camera *camera,
+    const struct sector *sector, 
+    const struct wall *wall, 
+    texture *textures,
+    const float depth,
+    const float s,
+    const int y0, 
+    const int y1,
+    const int floor_y,
+    const int ceil_y,
+    const int x,
+    const float intensity
+) {
+    int tex_x, tex_y, bayer_x = x % BAYER_NUM;
+    double world_height;
+
+    // calculate x value of texture
+    float wall_len = wall_length(wall);
+    tex_x = (int) (TEX_WIDTH_DENSITY * TEX_WIDTH * s * wall_len) % TEX_WIDTH;
+
+    // calculate transformation from world plane to image plane
+    double height_factor = (sector->ceil_z - sector->floor_z) / (ceil_y + floor_y);
+
+    for (int y = y0; y < y1; y++) {
+        world_height = abs(y - ((SCR_HEIGHT / 2) - floor_y)) * height_factor;
+        
+        tex_y = (int) (TEX_HEIGHT_DENSITY * TEX_HEIGHT * world_height) % TEX_HEIGHT;
+        struct rgb *diffuse_col = textures[wall->texture_id][tex_y * TEX_WIDTH + tex_x];
+    
+        #ifdef BAYER
+        float bayer_threshold = bayer_matrix[bayer_x][y % BAYER_NUM];
+        float greyscale = 0.2126 * diffuse_col->r + 0.7152 * diffuse_col->g + 0.0722 * diffuse_col->b;
+        int lum = (greyscale * intensity) + bayer_threshold > 0.5 ? 1 : 0;
+
+        if (lum) {
+            pixel_arr[3 * (y * SCR_WIDTH + x) + 0] = 235.0 / 255.0;
+            pixel_arr[3 * (y * SCR_WIDTH + x) + 1] = 229.0 / 255.0;
+            pixel_arr[3 * (y * SCR_WIDTH + x) + 2] = 206.0 / 255.0;
+        } else {
+            pixel_arr[3 * (y * SCR_WIDTH + x) + 0] = 46.0 / 255.0;
+            pixel_arr[3 * (y * SCR_WIDTH + x) + 1] = 48.0 / 255.0;
+            pixel_arr[3 * (y * SCR_WIDTH + x) + 2] = 55.0 / 255.0;
+        }
+        #endif
+
+        #ifndef BAYER
+        pixel_arr[3 * (y * SCR_WIDTH + x) + 0] = intensity * diffuse_col->r;
+        pixel_arr[3 * (y * SCR_WIDTH + x) + 1] = intensity * diffuse_col->g;
+        pixel_arr[3 * (y * SCR_WIDTH + x) + 2] = intensity * diffuse_col->b;
+        #endif
+    }
+}
+
 void render(
     float *pixel_arr,
     const struct camera *camera,
     struct sector * const * const sectors,
+    texture *textures,
     const struct ray *ray,
     const int x,
     const int sector_id,
@@ -170,32 +245,33 @@ void render(
 
     struct wall *hit_wall = (sectors[hit_sector]->walls)[hit_id];
     // apply shading model to wall
-    float lambertian_coeff = lambertian(ray, camera->pos, depth, hit_wall, min(0.4 / powf(depth, 2.0), 0.3));
+    float lambertian_coeff = lambertian(ray, camera->pos, depth, hit_wall, min(0.4 / powf(depth, 2.0), 1.0));
+    struct vec2 light = {1.5, 1.5};
+    lambertian_coeff += lambertian(ray, &light, depth, hit_wall, 0.5);
     float intensity = min(max(AMBIENT + lambertian_coeff, 0.0), 1.0);  // clamp intensity coefficient
-    struct rgb colour = {intensity, intensity, intensity};
 
     if (sector->walls[hit_id]->portal != 0) {
         // recursively render the other sector
-        render(pixel_arr, camera, sectors, ray, x, sector->walls[hit_id]->portal, depth + FUDGE, sector_dist + 1);
+        render(pixel_arr, camera, sectors, textures, ray, x, sector->walls[hit_id]->portal, depth + FUDGE, sector_dist + 1);
 
         // calculate lintel height and convert to pixel coordinates
         float new_sector_ceil = sectors[sector->walls[hit_id]->portal]->ceil_z;
         int lintel_h = (int) (SCR_HEIGHT / 2) * ((new_sector_ceil - camera->height) / (depth * RATIO));
         int lintel_y =  min((SCR_HEIGHT / 2) + (lintel_h), SCR_HEIGHT - 1);
         // draw the lintel
-        draw_vert(pixel_arr, x, lintel_y, y1, &colour);
+        draw_wall(pixel_arr, camera, sector, hit_wall, textures, depth, curr_len, lintel_y, y1, floor_y, ceil_y, x, intensity);
         
         // calculate sill height and convert to pixel coordinates
         float new_sector_floor = sectors[sector->walls[hit_id]->portal]->floor_z;
         int sill_h = (int) (SCR_HEIGHT / 2) * ((camera->height - new_sector_floor) / (depth * RATIO));
         int sill_y = max((SCR_HEIGHT / 2) - sill_h, 0);
         // draw the sill
-        draw_vert(pixel_arr, x, y0, sill_y, &colour);
+        draw_wall(pixel_arr, camera, sector, hit_wall, textures, depth, curr_len, y0, sill_y, floor_y, ceil_y, x, intensity);
     } else if (is_vertex) {
         struct rgb vertex_colour = {1.0, 1.0, 1.0};
         draw_vert(pixel_arr, x, y0, y1, &vertex_colour);
     } else {
-        draw_vert(pixel_arr, x, y0, y1, &colour);
+        draw_wall(pixel_arr, camera, sector, hit_wall, textures, depth, curr_len, y0, y1, floor_y, ceil_y, x, intensity);
     }
     // draw floor and ceiling
     struct rgb shaded_floor_colour = {

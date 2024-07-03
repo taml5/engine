@@ -5,54 +5,6 @@
 #include "graphics.h"
 #include "load.h"
 
-/**
- * Process the inputs of the user and perform different actions based on them.
- * 
- * @param window: A pointer to the GLFW window struct.
- * @param camera: A pointer to the camera struct.
- */
-void process_input(GLFWwindow *window, 
-                   struct camera *camera, 
-                   struct sector **sectors,
-                   struct vec2 *new)
-{
-    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
-        glfwSetWindowShouldClose(window, 1);
-    }
-    if (glfwGetKey(window, GLFW_KEY_J) == GLFW_PRESS) {
-        // turn left
-        camera->angle = fmod(camera->angle + ROTSPD, PI * 2);
-        camera->anglecos = cos(camera->angle);
-        camera->anglesin = sin(camera->angle);
-    }
-    if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS) {
-        // turn right
-        camera->angle = fmod(camera->angle - ROTSPD, PI * 2);
-        camera->anglecos = cos(camera->angle);
-        camera->anglesin = sin(camera->angle);
-    }
-    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-        // go back
-        new->x = camera->pos->x + MVTSPD * camera->anglecos;
-        new->y = camera->pos->y + MVTSPD * camera->anglesin;
-    }
-    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-        // go forward
-        new->x = camera->pos->x - MVTSPD * camera->anglecos;
-        new->y = camera->pos->y - MVTSPD * camera->anglesin;
-    }
-    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-        // go left
-        new->x = camera->pos->x - MVTSPD * camera->anglesin;
-        new->y = camera->pos->y + MVTSPD * camera->anglecos;
-    }
-    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-        // go right
-        new->x = camera->pos->x + MVTSPD * camera->anglesin;
-        new->y = camera->pos->y - MVTSPD * camera->anglecos;
-    }
-}
-
 int main(int argc, char *argv[]) {
     int fps = 0;
     if (!glfwInit()) {
@@ -67,6 +19,11 @@ int main(int argc, char *argv[]) {
     // load sectors and build sector and wall structs
     int n_sectors;
     struct sector **sectors = load_sectors("./content/map.txt", &n_sectors);
+
+    // load textures
+    int n_textures = 1;
+    texture *textures = malloc(n_textures * sizeof(texture));
+    textures[0] = load_texture("./content/textures/wood.ppm");
 
     // initialise pixel buffer storing luminance and alpha
     float *pixel_arr = malloc(sizeof(float) * SCR_WIDTH * SCR_HEIGHT * 3);
@@ -112,7 +69,7 @@ int main(int argc, char *argv[]) {
         /* Render here */
         for (int x = 0; x < SCR_WIDTH; x++) {
             struct ray *ray = viewing_ray(camera, x);
-            render(pixel_arr, camera, sectors, ray, x, camera->sector, FUDGE, 0);
+            render(pixel_arr, camera, sectors, textures, ray, x, camera->sector, FUDGE, 0);
             destroy_ray(ray);
         }
 
@@ -128,8 +85,9 @@ int main(int argc, char *argv[]) {
         fps++;
     }
 
-    destroy_sectors(sectors, &n_sectors);
     glfwTerminate();
+    destroy_sectors(sectors, n_sectors);
+    destroy_textures(textures, n_textures);
     free(camera->pos);
     free(camera);
     free(pixel_arr);

@@ -7,12 +7,20 @@
 #include <math.h>
 #include <stdbool.h>
 
-#define FUDGE 1e-6  // fudge factor to avoid floating point errors
+#define FUDGE (1e-6)  // fudge factor to avoid floating point errors
 
-#define ROTSPD 2.0f * 0.016f  // camera rotating speed
-#define MVTSPD 1.5f * 0.016f  // movement speed
+#define SCR_WIDTH (640)  // screen width
+#define SCR_HEIGHT (480)  // screen height
+#define RATIO ((float) SCR_HEIGHT / (float) SCR_WIDTH)  // the aspect ratio
 
-#define CAM_Z 1.70
+#define ROTSPD (2.0f * 0.016f)  // camera rotating speed
+#define MVTSPD (1.5f * 0.016f)  // movement speed
+#define CAM_Z (1.70)  // the default height of the camera
+
+#define TEX_WIDTH (128)  // texture width
+#define TEX_HEIGHT (128)  // texture height
+#define TEX_WIDTH_DENSITY 1  // how much of the texture width is displayed per metre
+#define TEX_HEIGHT_DENSITY 1  // how much of the texture height is displayed per metre
 
 /**
  * A struct representing a 2D float vector.
@@ -49,6 +57,7 @@ struct rgb {
     float b;
 };
 
+typedef struct rgb **texture;
 
 /**
  * A wall of the map.
@@ -57,10 +66,12 @@ struct rgb {
  * @param end: The ending endpoint of the wall.
  * @param portal: The sector that this portal leads to. If this is not
  *                a portal, its value will be -1.
+ * @param texture_id: The id of the wall texture.
  */
 struct wall {
     struct vec2i *start, *end;
     int portal;
+    int texture_id;
 };
 
 /**
@@ -99,6 +110,17 @@ struct camera {
     int sector;
     float angle, anglecos, anglesin, height;
 };
+
+/**
+ * Process the inputs of the user and perform different actions based on them.
+ * 
+ * @param window: A pointer to the GLFW window struct.
+ * @param camera: A pointer to the camera struct.
+ */
+void process_input(GLFWwindow *window, 
+                   struct camera *camera, 
+                   struct sector **sectors,
+                   struct vec2 *new);
 
 /**
  * Update the camera's location and sector if necessary. Returns whether the camera's position

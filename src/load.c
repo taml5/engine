@@ -36,6 +36,7 @@ struct sector **load_sectors(const char *filepath, int *n_sectors) {
             wall->start = start;
             wall->end = end;
             wall->portal = portal;
+            wall->texture_id = 0;
 
             walls[j] = wall;
         }
@@ -59,8 +60,40 @@ struct sector **load_sectors(const char *filepath, int *n_sectors) {
     return sectors;
 }
 
-void destroy_sectors(struct sector **sectors, int *n_sectors) {
-    for (int i = 1; i < *n_sectors + 1; i++) {
+texture load_texture(const char *filepath) {
+    FILE *file;
+    if ((file = fopen(filepath, "rb")) == NULL) {
+        perror("load_sectors: ");
+        return NULL;
+    }
+
+    int width, height, max_colour;
+    fscanf(file, "P6\n %d %d %d", &width, &height, &max_colour);
+    if (width != TEX_WIDTH || height != TEX_HEIGHT || max_colour != 255) {
+        fprintf(stderr, "Invalid image format.\n");
+        return NULL;
+    }
+
+    fseek(file, 1, SEEK_CUR);
+
+    texture texture = malloc(TEX_HEIGHT * TEX_WIDTH * sizeof(struct rgb *));
+    for (int y = TEX_HEIGHT - 1; y >= 0; y--) {
+        for (int x = 0; x < TEX_WIDTH; x++) {
+            unsigned char colour[3];
+            fread(colour, 1, 3, file);
+            struct rgb *texel = malloc(sizeof(struct rgb));
+            texel->r = colour[0] / 255.0;
+            texel->g = colour[1] / 255.0;
+            texel->b = colour[2] / 255.0;
+            texture[y * TEX_WIDTH + x] = texel;
+        }
+    }
+
+    return texture;
+}
+
+void destroy_sectors(struct sector **sectors, const int n_sectors) {
+    for (int i = 1; i < n_sectors + 1; i++) {
         for (int j = 0; j < sectors[i]->n_walls; j++) {
             struct wall *wall = sectors[i]->walls[j];
             free(wall->start);
@@ -73,5 +106,16 @@ void destroy_sectors(struct sector **sectors, int *n_sectors) {
         free(sectors[i]);
     }
     free(sectors);
+    return;
+}
+
+void destroy_textures(texture *textures, const int n_textures) {
+    for (int i = 0; i < n_textures; i++) {
+        for (int j = 0; j < TEX_HEIGHT * TEX_WIDTH; j++){
+            free(textures[i][j]);
+        }        
+        free(textures[i]);
+    }
+    free(textures);
     return;
 }

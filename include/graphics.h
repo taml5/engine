@@ -7,17 +7,20 @@
 #define min(a, b) (a < b ? a : b)
 #define max(a, b) (a < b ? b : a)
 
+// constants for the alpha max plus beta min algorithm
+// https://en.wikipedia.org/wiki/Alpha_max_plus_beta_min_algorithm
+#define ALPHA 0.960433870103
+#define BETA 0.397824734759
+
 #define FOCAL_LEN 1  // the distance from the camera to the image plane, in game units
+#define WORLD2CAM(x) (-1 + (2 * (x + 0.5)) / SCR_WIDTH)  // transformation from world plane to image plane
 
-#define SCR_WIDTH 640  // screen width
-#define SCR_HEIGHT 480  // screen height
-#define RATIO ((float) SCR_HEIGHT / (float) SCR_WIDTH)
-
-#define EDGE_LIM 0.005  // limit for edge detection
-#define WORLD2CAM(x) (-1 + (2 * (x + 0.5)) / SCR_WIDTH)   // transformation from world plane to image plane
-
+#define EDGE_LIM 0.01  // limit for edge detection
 #define AMBIENT 0.0  // the ambient light intensity value
-#define SHADING_FAC 0.2  // determines floor/ceiling intensity per sector distance
+#define SHADING_FAC 0.25  // determines floor/ceiling intensity per sector distance
+
+// #define BAYER  // whether to apply the dithering filter
+#define BAYER_NUM 8  // the size of the bayer matrix
 
 /**
  * A struct representing a light in the world.
@@ -129,6 +132,47 @@ bool intersection(const struct ray *ray, const struct wall *wall, const double m
 float lambertian(const struct ray *ray, const struct vec2 *light_pt, const float depth, const struct wall *wall, const float intensity);
 
 /**
+ * Get the length of the given wall. Uses the Alpha max plus beta min algorithm:
+ * https://en.wikipedia.org/wiki/Alpha_max_plus_beta_min_algorithm
+ * 
+ * @param wall: The wall.
+ * @returns the magnitude of the wall.
+ */
+float wall_length(const struct wall *wall);
+
+/**
+ * Draw the given wall onto the given pixel buffer with the corresponding texture and shading applied.
+ * 
+ * @param pixel_arr: The pixel buffer.
+ * @param camera: The camera.
+ * @param wall: The wall to be drawn.
+ * @param textures: The array of textures.
+ * @param depth: The distance between the camera and the wall at the given x coordinate.
+ * @param s: The fraction of the intersection of the wall from the starting endpoint.
+ * @param y0: The bottom of the wall on the image plane.
+ * @param y1: The top of the wall on the image plane.
+ * @param floor_y: The bottom of the wall on the image plane, extrapolated beyond the screen height.
+ * @param ceil_y: The top of the wall, extrapolated beyond the screen height.
+ * @param x: The x coordinate.
+ * @param intensity: The intensity of the light affecting the wall.
+ */
+void draw_wall(
+    float *pixel_arr,
+    const struct camera *camera,
+    const struct sector *sector, 
+    const struct wall *wall, 
+    texture *textures,
+    const float depth,
+    const float s,
+    const int y0, 
+    const int y1,
+    const int floor_y,
+    const int ceil_y,
+    const int x,
+    const float intensity
+);
+
+/**
  * Render the world scene on the given x coordinate.
  * 
  * @param pixel_arr: The pixel buffer.
@@ -142,6 +186,7 @@ float lambertian(const struct ray *ray, const struct vec2 *light_pt, const float
 void render(float *pixel_arr,
     const struct camera *camera,
     struct sector * const * const sectors,
+    texture *textures,
     const struct ray *ray,
     const int x,
     const int sector_id,

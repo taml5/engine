@@ -267,12 +267,19 @@ void render(
         int sill_y = max((SCR_HEIGHT / 2) - sill_h, 0);
         // draw the sill
         draw_wall(pixel_arr, camera, sector, hit_wall, textures, depth, curr_len, y0, sill_y, floor_y, ceil_y, x, intensity);
+    #ifdef BAYER
     } else if (is_vertex) {
         struct rgb vertex_colour = {1.0, 1.0, 1.0};
         draw_vert(pixel_arr, x, y0, y1, &vertex_colour);
     } else {
         draw_wall(pixel_arr, camera, sector, hit_wall, textures, depth, curr_len, y0, y1, floor_y, ceil_y, x, intensity);
     }
+    #endif
+    #ifndef BAYER
+    } else {
+        draw_wall(pixel_arr, camera, sector, hit_wall, textures, depth, curr_len, y0, y1, floor_y, ceil_y, x, intensity);
+    }
+    #endif
     // draw floor and ceiling
     struct rgb shaded_floor_colour = {
         sector->floor_colour->r - (sector->floor_colour->r * SHADING_FAC * sector_dist),

@@ -1,5 +1,7 @@
 engine
 build/
+content/textures/princess.ppm
+content/textures/test.ppm
 
 ## macOS
 

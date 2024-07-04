@@ -28,11 +28,6 @@
 float dot(const struct vec2 *a, const struct vec2 *b);
 
 /**
- * Return the dot product between the integer vectors a and b.
- */
-float doti(const struct vec2i *a, const struct vec2i *b);
-
-/**
  * https://en.wikipedia.org/wiki/Fast_inverse_square_root
  * 
  * The fast inverse square root algorithm from Quake III. Directly
@@ -42,17 +37,6 @@ float doti(const struct vec2i *a, const struct vec2i *b);
  * @return The inverse square root of the number.
  */
 float Q_rsqrt(const float number);
-
-/**
- * Return a normalised version of the given vector v.
- */
-struct vec2 normalise(const struct vec2 *v);
-
-/**
- * Return the clockwise normal to the wall.
- */
-struct vec2 wall_norm(const struct wall *wall);
-
 
 /**
  * A struct representing a ray described parametrically.

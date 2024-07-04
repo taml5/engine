@@ -17,10 +17,6 @@ float dot(const struct vec2 *a, const struct vec2 *b) {
     return (a->x * b->x) + (a->y * b->y);
 }
 
-float doti(const struct vec2i *a, const struct vec2i *b) {
-    return (a->x * b->x) + (a->y * b->y);
-}
-
 float Q_rsqrt(const float number) {
   int i;
   float x2, y;
@@ -37,6 +33,9 @@ float Q_rsqrt(const float number) {
   return y;
 }
 
+/**
+ * Return a normalised version of the given vector v.
+ */
 struct vec2 normalise(const struct vec2 *v) {
     float invsqrt = Q_rsqrt(powf(v->x, 2.0) + powf(v->y, 2.0));
 
@@ -46,6 +45,9 @@ struct vec2 normalise(const struct vec2 *v) {
     };
 }
 
+/**
+ * Return the clockwise normal to the given wall.
+ */
 struct vec2 wall_norm(const struct wall *wall) {
     float walldir_x = wall->end->x - wall->start->x;
     float walldir_y = wall->end->y - wall->start->y;

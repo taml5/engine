@@ -6,7 +6,9 @@
 #include "load.h"
 
 int main(int argc, char *argv[]) {
+    #ifdef DEBUG
     int fps = 0;
+    #endif
     if (!glfwInit()) {
         fprintf(stderr, "Error: GLFW failed to initialize\n");
         exit(1);
@@ -86,7 +88,9 @@ int main(int argc, char *argv[]) {
         /* Poll for and process events */
         glfwPollEvents();
 
+        #ifdef DEBUG
         fps++;
+        #endif
     }
 
     glfwTerminate();
@@ -96,6 +100,8 @@ int main(int argc, char *argv[]) {
     free(camera);
     free(pixel_arr);
 
+    #ifdef DEBUG
     printf("frames=%d\n", fps);
+    #endif
     return 0;
 }

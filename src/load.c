@@ -15,7 +15,9 @@ struct sector **load_sectors(const char *filepath, int *n_sectors) {
     for (int i = 1; i < *n_sectors + 1; i++) {
         fscanf(file, "%d %d %f %f", &id, &n_walls, &floor_z, &ceil_z);
         fscanf(file, "%f %f %f %f %f %f", &floor_r, &floor_g, &floor_b, &ceil_r, &ceil_g, &ceil_b);
+        #ifdef DEBUG
         printf("loading sector %d with %d walls\n", id, n_walls);
+        #endif
         struct sector *sector = malloc(sizeof(struct sector));
         struct wall **walls = malloc(sizeof(struct wall*) * n_walls);
         sector->floor_colour = malloc(sizeof(struct rgb));
@@ -28,7 +30,9 @@ struct sector **load_sectors(const char *filepath, int *n_sectors) {
             struct vec2i *end = malloc(sizeof(struct vec2i));
             fscanf(file, "%d %d %d %d %d", &start_x, &start_y, &end_x, &end_y, &portal);
             
+            #ifdef DEBUG
             printf("WALL %d: (%d, %d) to (%d, %d), portal: %d\n", j, start_x, start_y, end_x, end_y, portal);
+            #endif
             start->x = start_x;
             start->y = start_y;
             end->x = end_x;

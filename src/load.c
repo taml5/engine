@@ -1,9 +1,12 @@
 #include "load.h"
 
 struct sector **load_sectors(const char *filepath, int *n_sectors) {
+    #ifdef DEBUG
+    printf("Loading sectors from %s\n", filepath);
+    #endif
     FILE *file;
     if ((file = fopen(filepath, "r")) == NULL) {
-        perror("load_sectors: ");
+        perror("load_sectors");
         return NULL;
     }
     fscanf(file, "%d", n_sectors);
@@ -65,9 +68,12 @@ struct sector **load_sectors(const char *filepath, int *n_sectors) {
 }
 
 texture load_texture(const char *filepath) {
+    #ifdef DEBUG
+    printf("Loading textures from %s\n", filepath);
+    #endif
     FILE *file;
     if ((file = fopen(filepath, "rb")) == NULL) {
-        perror("load_sectors: ");
+        perror("load_texture");
         return NULL;
     }
 
@@ -97,9 +103,12 @@ texture load_texture(const char *filepath) {
 }
 
 struct light **load_lights(const char *filepath, int *n_lights) {
+    #ifdef DEBUG
+    printf("Loading lights from %s\n", filepath);
+    #endif
     FILE *file;
     if ((file = fopen(filepath, "r")) == NULL) {
-        perror("load_sectors: ");
+        perror("load_lights");
         return NULL;
     }
     fscanf(file, "%d", n_lights);

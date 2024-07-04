@@ -21,16 +21,25 @@ int main(int argc, char *argv[]) {
     // load sectors and build sector and wall structs
     int n_sectors;
     struct sector **sectors = load_sectors("./content/map.txt", &n_sectors);
+    if (sectors == NULL) {
+        fprintf(stderr, "Error loading sectors, exiting...\n");
+        exit(1);
+    }
 
     // load textures
-    int n_textures = 2;
+    int n_textures = 3;
     texture *textures = malloc(n_textures * sizeof(texture));
     textures[0] = load_texture("./content/textures/wood.ppm");
     textures[1] = load_texture("./content/textures/rocks.ppm");
+    textures[2] = load_texture("./content/textures/brick.ppm");
 
     // load lights
     int n_lights;
     struct light **lights = load_lights("./content/lights.txt", &n_lights);
+    if (lights == NULL) {
+        fprintf(stderr, "Error loading lights, exiting...\n");
+        exit(1);
+    }
 
     // initialise pixel buffer storing luminance and alpha
     float *pixel_arr = malloc(sizeof(float) * SCR_WIDTH * SCR_HEIGHT * 3);

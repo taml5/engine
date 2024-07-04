@@ -12,6 +12,7 @@ static const float bayer_matrix[BAYER_NUM][BAYER_NUM] = {
     {0.484375, -0.015625, 0.359375, -0.140625, 0.453125, -0.046875, 0.328125, -0.171875}
 };
 
+static const struct rgb vertex_colour = {1.0, 1.0, 1.0};
 
 float dot(const struct vec2 *a, const struct vec2 *b) {
     return (a->x * b->x) + (a->y * b->y);
@@ -149,7 +150,7 @@ static float wall_length(const struct wall *wall) {
  * @param y1: The ending endpoint of the line.
  * @param colour: The colour of the line.
  */
-static void draw_vert(float *pixel_arr, int x, int y0, int y1, struct rgb *colour) {
+static void draw_vert(float *pixel_arr, const int x, const int y0, const int y1, const struct rgb *colour) {
     for (int i = y0; i < y1; i++) {
         if (fabs(colour->r - colour->g) > FUDGE 
         || fabs(colour->r - colour->b) > FUDGE 
@@ -281,7 +282,7 @@ static float lambertian(
 float shade(
     const struct camera *camera,
     const struct ray *ray,
-    struct light * const *lights,
+    struct light *const *const lights,
     const int n_lights,
     const float depth, 
     const struct wall *wall
@@ -298,9 +299,9 @@ float shade(
 void render(
     float *pixel_arr,
     const struct camera *camera,
-    struct sector * const * const sectors,
+    struct sector *const *const sectors,
     texture *textures,
-    struct light **lights,
+    struct light *const *const lights,
     const int n_lights,
     const struct ray *ray,
     const int x,
@@ -367,7 +368,6 @@ void render(
     }
     #ifdef BAYER
     else if (is_vertex) {
-        struct rgb vertex_colour = {1.0, 1.0, 1.0};
         draw_vert(pixel_arr, x, y0, y1, &vertex_colour);
     } else {
         draw_wall(pixel_arr, camera, sector, hit_wall, textures, depth, curr_len, y0, y1, floor_y, ceil_y, x, intensity);

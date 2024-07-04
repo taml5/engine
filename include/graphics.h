@@ -83,9 +83,9 @@ void destroy_ray(struct ray *ray);
  */
 void render(float *pixel_arr,
     const struct camera *camera,
-    struct sector * const * const sectors,
+    struct sector *const *const sectors,
     texture *textures,
-    struct light **lights,
+    struct light *const *const lights,
     const int n_lights,
     const struct ray *ray,
     const int x,

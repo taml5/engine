@@ -96,6 +96,17 @@ struct sector {
 };
 
 /**
+ * A struct representing a light in the world.
+ * 
+ * @param pos: The position of the light in world coordinates.
+ * @param intensity: The intensity of the light, between 0.0 and 1.0.
+ */
+struct light {
+    struct vec2 *pos;
+    float intensity;
+};
+
+/**
  * The camera.
  * 
  * @param pos: The current position (x, y) of the camera.

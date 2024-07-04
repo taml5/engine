@@ -92,6 +92,30 @@ texture load_texture(const char *filepath) {
     return texture;
 }
 
+struct light **load_lights(const char *filepath, int *n_lights) {
+    FILE *file;
+    if ((file = fopen(filepath, "r")) == NULL) {
+        perror("load_sectors: ");
+        return NULL;
+    }
+    fscanf(file, "%d", n_lights);
+    struct light **lights = malloc(*n_lights * sizeof(struct light *));
+
+    float x, y, intensity;
+    for (int i = 0; i < *n_lights; i++) {
+        fscanf(file, "%f %f %f", &x, &y, &intensity);
+        struct light *light = malloc(sizeof(struct light));
+        struct vec2 *pos = malloc(sizeof(struct vec2));
+        pos->x = x;
+        pos->y = y;
+        
+        light->pos = pos;
+        light->intensity = intensity;
+        lights[i] = light;
+    }
+    return lights;
+}
+
 void destroy_sectors(struct sector **sectors, const int n_sectors) {
     for (int i = 1; i < n_sectors + 1; i++) {
         for (int j = 0; j < sectors[i]->n_walls; j++) {
@@ -118,4 +142,13 @@ void destroy_textures(texture *textures, const int n_textures) {
     }
     free(textures);
     return;
+}
+
+void destroy_lights(struct light **lights, const int n_lights) {
+    for (int i = 0; i < n_lights; i++) {
+        struct light *light = lights[i];
+        free(light->pos);
+        free(light);
+    }
+    free(lights);
 }

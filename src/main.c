@@ -25,6 +25,10 @@ int main(int argc, char *argv[]) {
     texture *textures = malloc(n_textures * sizeof(texture));
     textures[0] = load_texture("./content/textures/wood.ppm");
 
+    // load lights
+    int n_lights;
+    struct light **lights = load_lights("./content/lights.txt", &n_lights);
+
     // initialise pixel buffer storing luminance and alpha
     float *pixel_arr = malloc(sizeof(float) * SCR_WIDTH * SCR_HEIGHT * 3);
 
@@ -69,7 +73,7 @@ int main(int argc, char *argv[]) {
         /* Render here */
         for (int x = 0; x < SCR_WIDTH; x++) {
             struct ray *ray = viewing_ray(camera, x);
-            render(pixel_arr, camera, sectors, textures, ray, x, camera->sector, FUDGE, 0);
+            render(pixel_arr, camera, sectors, textures, lights, n_lights, ray, x, camera->sector, FUDGE, 0);
             destroy_ray(ray);
         }
 

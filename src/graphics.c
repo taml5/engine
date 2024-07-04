@@ -54,27 +54,6 @@ struct vec2 wall_norm(const struct wall *wall) {
     return normalise(&walln);
 }
 
-void draw_vert(float *pixel_arr, int x, int y0, int y1, struct rgb *colour) {
-    for (int i = y0; i < y1; i++) {
-        if (fabs(colour->r - colour->g) > FUDGE 
-        || fabs(colour->r - colour->b) > FUDGE 
-        || fabs(colour->g - colour->b) > FUDGE) {
-            // not greyscale - render in full colour
-            pixel_arr[3 * (i * SCR_WIDTH + x) + 0] = colour->r;
-            pixel_arr[3 * (i * SCR_WIDTH + x) + 1] = colour->g;
-            pixel_arr[3 * (i * SCR_WIDTH + x) + 2] = colour->b;
-        } else {
-            // greyscale - apply dithering filter
-            float lum_out = colour->r + bayer_matrix[x % BAYER_NUM][i % BAYER_NUM];
-            float lum = lum_out > 0.5 ? 1.0 : 0.0;
-
-            pixel_arr[3 * (i * SCR_WIDTH + x) + 0] = lum;
-            pixel_arr[3 * (i * SCR_WIDTH + x) + 1] = lum;
-            pixel_arr[3 * (i * SCR_WIDTH + x) + 2] = lum;
-        }
-    }
-}
-
 struct ray *viewing_ray(const struct camera *camera, const int x) {
     double u_coord = -1.0 + (2 * (x + 0.5)) / SCR_WIDTH;
     
@@ -93,7 +72,21 @@ void destroy_ray(struct ray *ray) {
     free(ray);
 }
 
-bool intersection(
+/**
+ * Determine if there is an intersection between a given wall and a viewing ray. Store the parameter `t` 
+ * from the parametric representation of the ray such that the vector `ray.origin + t * ray.direction` 
+ * gives the intersection point.
+ * 
+ * @param ray: The viewing ray.
+ * @param wall: The wall which an intersection is to be checked with.
+ * @param min_t: The minimum depth considered.
+ * @param depth: The "depth" of the intersection, that is, the distance between the camera and the 
+ *               wall, given in the basis of the focal length.
+ * @param length: How far along the wall with respect to the start endpoint the intersection occurs at.
+ * @param is_vertex: Whether the hit point is on the endpoints or not.
+ * @return Whether there was an intersection or not.
+ */
+static bool intersection(
     const struct ray *ray, 
     const struct wall *wall, 
     const double min_t, 
@@ -131,30 +124,67 @@ bool intersection(
     return true;
 }
 
-float lambertian(
-    const struct ray *ray, 
-    const struct vec2 *light_pt, 
-    const float depth, 
-    const struct wall *wall, 
-    const float intensity
-) {
-    struct vec2 n = wall_norm(wall);
-    struct vec2 q = {
-        -((ray->origin->x - depth * ray->direction->x) - light_pt->x), 
-        -((ray->origin->y - depth * ray->direction->y) - light_pt->y)
-    };
-    struct vec2 light = normalise(&q);
-    return intensity * max(dot(&light, &n), 0.0);
-}
-
-float wall_length(const struct wall *wall) {
+/**
+ * Get the length of the given wall. Uses the Alpha max plus beta min algorithm:
+ * https://en.wikipedia.org/wiki/Alpha_max_plus_beta_min_algorithm
+ * 
+ * @param wall: The wall.
+ * @returns the magnitude of the wall.
+ */
+static float wall_length(const struct wall *wall) {
     float wall_len_x = abs(wall->end->x - wall->start->x);
     float wall_len_y = abs(wall->end->y - wall->start->y);
 
     return ALPHA * max(wall_len_x, wall_len_y) + BETA * min(wall_len_x, wall_len_y);
 }
 
-void draw_wall(
+/**
+ * Draw a vertical line from (x, y0) to (x, y1) in the pixel buffer.
+ * 
+ * @param pixel_arr: The pixel buffer.
+ * @param x: The x coordinate of the line.
+ * @param y0: The starting endpoint of the line.
+ * @param y1: The ending endpoint of the line.
+ * @param colour: The colour of the line.
+ */
+static void draw_vert(float *pixel_arr, int x, int y0, int y1, struct rgb *colour) {
+    for (int i = y0; i < y1; i++) {
+        if (fabs(colour->r - colour->g) > FUDGE 
+        || fabs(colour->r - colour->b) > FUDGE 
+        || fabs(colour->g - colour->b) > FUDGE) {
+            // not greyscale - render in full colour
+            pixel_arr[3 * (i * SCR_WIDTH + x) + 0] = colour->r;
+            pixel_arr[3 * (i * SCR_WIDTH + x) + 1] = colour->g;
+            pixel_arr[3 * (i * SCR_WIDTH + x) + 2] = colour->b;
+        } else {
+            // greyscale - apply dithering filter
+            float lum_out = colour->r + bayer_matrix[x % BAYER_NUM][i % BAYER_NUM];
+            float lum = lum_out > 0.5 ? 1.0 : 0.0;
+
+            pixel_arr[3 * (i * SCR_WIDTH + x) + 0] = lum;
+            pixel_arr[3 * (i * SCR_WIDTH + x) + 1] = lum;
+            pixel_arr[3 * (i * SCR_WIDTH + x) + 2] = lum;
+        }
+    }
+}
+
+/**
+ * Draw the given wall onto the given pixel buffer with the corresponding texture and shading applied.
+ * 
+ * @param pixel_arr: The pixel buffer.
+ * @param camera: The camera.
+ * @param wall: The wall to be drawn.
+ * @param textures: The array of textures.
+ * @param depth: The distance between the camera and the wall at the given x coordinate.
+ * @param s: The fraction of the intersection of the wall from the starting endpoint.
+ * @param y0: The bottom of the wall on the image plane.
+ * @param y1: The top of the wall on the image plane.
+ * @param floor_y: The bottom of the wall on the image plane, extrapolated beyond the screen height.
+ * @param ceil_y: The top of the wall, extrapolated beyond the screen height.
+ * @param x: The x coordinate.
+ * @param intensity: The intensity of the light affecting the wall.
+ */
+static void draw_wall(
     float *pixel_arr,
     const struct camera *camera,
     const struct sector *sector, 
@@ -209,11 +239,67 @@ void draw_wall(
     }
 }
 
+/**
+ * Calculate the luminosity given by the wall from the light at `light_pt` with intensity `intensity` using
+ * the Lambertian model.
+ * 
+ * @param ray: The viewing ray that hits the wall.
+ * @param light_pt: The position of the light.
+ * @param depth: The distance from the camera to the wall.
+ * @param wall: The wall.
+ * @param intensity: The intensity of light.
+ */
+static float lambertian(
+    const struct ray *ray, 
+    const struct vec2 *light_pt, 
+    const float depth, 
+    const struct wall *wall, 
+    const float intensity
+) {
+    struct vec2 n = wall_norm(wall);
+    struct vec2 q = {
+        light_pt->x - (ray->origin->x - depth * ray->direction->x), 
+        light_pt->y - (ray->origin->y - depth * ray->direction->y)
+    };
+    struct vec2 light = normalise(&q);
+    return intensity * max(dot(&light, &n), 0.0);
+}
+
+/**
+ * Apply the shading model to the wall.
+ * 
+ * @param camera: The camera.
+ * @param ray: The light ray.
+ * @param lights: The array of lights in the map.
+ * @param n_lights: The number of lights in the map.
+ * @param depth: The distance from the camera to the wall.
+ * @param wall: The wall.
+ * @returns: The resulting light intensity from the shading model calculated from the wall and ray.
+ */
+float shade(
+    const struct camera *camera,
+    const struct ray *ray,
+    struct light * const *lights,
+    const int n_lights,
+    const float depth, 
+    const struct wall *wall
+) {
+    float light_intensity = 0.0;
+    for (int i = 0; i < n_lights; i++) {
+        struct light *light = lights[i];
+        light_intensity += lambertian(ray, light->pos, depth, wall, light->intensity);
+    }
+    light_intensity += lambertian(ray, camera->pos, depth, wall, min(0.4 / powf(depth, 2.0), 1.0));
+    return min(AMBIENT + light_intensity, 1.0);
+}
+
 void render(
     float *pixel_arr,
     const struct camera *camera,
     struct sector * const * const sectors,
     texture *textures,
+    struct light **lights,
+    const int n_lights,
     const struct ray *ray,
     const int x,
     const int sector_id,
@@ -245,14 +331,23 @@ void render(
 
     struct wall *hit_wall = (sectors[hit_sector]->walls)[hit_id];
     // apply shading model to wall
-    float lambertian_coeff = lambertian(ray, camera->pos, depth, hit_wall, min(0.4 / powf(depth, 2.0), 1.0));
-    struct vec2 light = {1.5, 1.5};
-    lambertian_coeff += lambertian(ray, &light, depth, hit_wall, 0.5);
-    float intensity = min(max(AMBIENT + lambertian_coeff, 0.0), 1.0);  // clamp intensity coefficient
+    float intensity = shade(camera, ray, lights, n_lights, depth, hit_wall);
 
     if (sector->walls[hit_id]->portal != 0) {
         // recursively render the other sector
-        render(pixel_arr, camera, sectors, textures, ray, x, sector->walls[hit_id]->portal, depth + FUDGE, sector_dist + 1);
+        render(
+            pixel_arr, 
+            camera, 
+            sectors, 
+            textures, 
+            lights, 
+            n_lights,
+            ray, 
+            x, 
+            sector->walls[hit_id]->portal, 
+            depth + FUDGE, 
+            sector_dist + 1
+        );
 
         // calculate lintel height and convert to pixel coordinates
         float new_sector_ceil = sectors[sector->walls[hit_id]->portal]->ceil_z;
@@ -267,8 +362,9 @@ void render(
         int sill_y = max((SCR_HEIGHT / 2) - sill_h, 0);
         // draw the sill
         draw_wall(pixel_arr, camera, sector, hit_wall, textures, depth, curr_len, y0, sill_y, floor_y, ceil_y, x, intensity);
+    }
     #ifdef BAYER
-    } else if (is_vertex) {
+    else if (is_vertex) {
         struct rgb vertex_colour = {1.0, 1.0, 1.0};
         draw_vert(pixel_arr, x, y0, y1, &vertex_colour);
     } else {
@@ -276,7 +372,7 @@ void render(
     }
     #endif
     #ifndef BAYER
-    } else {
+    else {
         draw_wall(pixel_arr, camera, sector, hit_wall, textures, depth, curr_len, y0, y1, floor_y, ceil_y, x, intensity);
     }
     #endif

@@ -9,7 +9,6 @@
  * @param filepath: The filepath to read the map data from.
  * @param n_sectors: The number of sectors loaded.
  * @return A pointer to a heap allocated sector array.
- * 
  */
 struct sector **load_sectors(const char *filepath, int *n_sectors);
 
@@ -20,6 +19,16 @@ struct sector **load_sectors(const char *filepath, int *n_sectors);
  * @return A pointer to a heap allocated texture array.
  */
 texture load_texture(const char *filepath);
+
+/**
+ * Load the lights in the map from the given filepath.
+ * 
+ * @param file
+ * @param filepath: The filepath to read the light data from.
+ * @param n_sectors: The number of lights loaded.
+ * @return A pointer to a heap allocated light array.
+ */
+struct light **load_lights(const char *filepath, int *n_lights);
 
 /**
  * Deallocate the sector array.
@@ -36,3 +45,11 @@ void destroy_sectors(struct sector **sectors, const int n_sectors);
  * @param n_textures: The number of textures loaded.
  */
 void destroy_textures(texture *textures, const int n_textures);
+
+/**
+ * Deallocate the light array.
+ * 
+ * @param lights: A pointer to the light array.
+ * @param n_lights: The number of lights loaded.
+ */
+void destroy_lights(struct light **lights, const int n_lights);

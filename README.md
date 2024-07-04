@@ -6,5 +6,5 @@
     - [X] Fix border vertex out of bounds clipping
 - [X] Lighting
 - [X] Add sector heights
-- [ ] Texture mapping
+- [X] Texture mapping
 - [X] Dithering filter

@@ -220,7 +220,7 @@ static void draw_wall(
         #ifdef BAYER
         float bayer_threshold = bayer_matrix[bayer_x][y % BAYER_NUM];
         float greyscale = 0.2126 * diffuse_col->r + 0.7152 * diffuse_col->g + 0.0722 * diffuse_col->b;
-        int lum = (greyscale * intensity) + bayer_threshold > 0.5 ? 1 : 0;
+        int lum = (greyscale * intensity) + bayer_threshold > BAYER_SENS ? 1 : 0;
 
         if (lum) {
             pixel_arr[3 * (y * SCR_WIDTH + x) + 0] = 235.0 / 255.0;

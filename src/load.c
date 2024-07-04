@@ -23,12 +23,12 @@ struct sector **load_sectors(const char *filepath, int *n_sectors) {
         sector->floor_colour = malloc(sizeof(struct rgb));
         sector->ceil_colour = malloc(sizeof(struct rgb));
         
-        int start_x, start_y, end_x, end_y, portal;
+        int start_x, start_y, end_x, end_y, portal, tex_id;
         for (int j = 0; j < n_walls; j++) {
             struct wall *wall = malloc(sizeof(struct wall));
             struct vec2i *start = malloc(sizeof(struct vec2i));
             struct vec2i *end = malloc(sizeof(struct vec2i));
-            fscanf(file, "%d %d %d %d %d", &start_x, &start_y, &end_x, &end_y, &portal);
+            fscanf(file, "%d %d %d %d %d %d", &start_x, &start_y, &end_x, &end_y, &portal, &tex_id);
             
             #ifdef DEBUG
             printf("WALL %d: (%d, %d) to (%d, %d), portal: %d\n", j, start_x, start_y, end_x, end_y, portal);
@@ -40,7 +40,7 @@ struct sector **load_sectors(const char *filepath, int *n_sectors) {
             wall->start = start;
             wall->end = end;
             wall->portal = portal;
-            wall->texture_id = 0;
+            wall->texture_id = tex_id;
 
             walls[j] = wall;
         }

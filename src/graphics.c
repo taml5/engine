@@ -12,7 +12,7 @@ static const float bayer_matrix[BAYER_NUM][BAYER_NUM] = {
     {0.484375, -0.015625, 0.359375, -0.140625, 0.453125, -0.046875, 0.328125, -0.171875}
 };
 
-static const struct rgb vertex_colour = {1.0, 1.0, 1.0};
+static const struct rgb vertex_colour = {235.0 / 255.0, 229.0 / 255.0, 206.0 / 255.0};
 
 float dot(const struct vec2 *a, const struct vec2 *b) {
     return (a->x * b->x) + (a->y * b->y);

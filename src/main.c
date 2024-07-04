@@ -23,9 +23,10 @@ int main(int argc, char *argv[]) {
     struct sector **sectors = load_sectors("./content/map.txt", &n_sectors);
 
     // load textures
-    int n_textures = 1;
+    int n_textures = 2;
     texture *textures = malloc(n_textures * sizeof(texture));
     textures[0] = load_texture("./content/textures/wood.ppm");
+    textures[1] = load_texture("./content/textures/rocks.ppm");
 
     // load lights
     int n_lights;

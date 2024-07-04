@@ -21,7 +21,7 @@
 
 #define BAYER  // whether to apply the dithering filter
 #define BAYER_NUM 8  // the size of the bayer matrix
-#define BAYER_SENS 0.55  // determines the amount of light and dark contrast in the dithering filter
+#define BAYER_SENS 0.5  // determines the amount of light and dark contrast in the dithering filter
 
 /**
  * Return the dot product between the vectors a and b.

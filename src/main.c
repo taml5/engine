@@ -106,6 +106,7 @@ int main(int argc, char *argv[]) {
     glfwTerminate();
     destroy_sectors(sectors, n_sectors);
     destroy_textures(textures, n_textures);
+    destroy_lights(lights, n_lights);
     free(camera->pos);
     free(camera);
     free(pixel_arr);

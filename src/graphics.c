@@ -309,7 +309,7 @@ void render(
     const double min_t,
     const int sector_dist
 ) {
-    // find the first hit wall
+    // find the closest hit wall
     const struct sector *sector = sectors[sector_id];
     bool hit = false, is_vertex = false;
     double depth = HUGE_VAL;

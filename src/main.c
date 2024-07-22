@@ -20,7 +20,7 @@ int main(int argc, char *argv[]) {
 
     // load sectors and build sector and wall structs
     int n_sectors;
-    struct sector **sectors = load_sectors("./content/map.txt", &n_sectors);
+    struct sector **sectors = load_sectors("./content/church.txt", &n_sectors);
     if (sectors == NULL) {
         fprintf(stderr, "Error loading sectors, exiting...\n");
         exit(1);
@@ -35,7 +35,7 @@ int main(int argc, char *argv[]) {
 
     // load lights
     int n_lights;
-    struct light **lights = load_lights("./content/lights.txt", &n_lights);
+    struct light **lights = load_lights("./content/churchlights.txt", &n_lights);
     if (lights == NULL) {
         fprintf(stderr, "Error loading lights, exiting...\n");
         exit(1);

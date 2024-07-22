@@ -2,7 +2,6 @@
 
 A BUILD-style graphics engine. Includes a Lambertian lighting system, a texture mapping system, and a ordered dithering filter.
 
-![A screenshot of the engine](./content/img.png)
 ![Another screenshot of the engine](./content//img2.png)
 
 ## Prerequisites
